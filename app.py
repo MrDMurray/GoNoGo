@@ -1,67 +1,88 @@
-from flask import Flask, render_template
-import requests
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-def fetch_latest_wind_data():
-    url = "https://www.met.ie/Open_Data/json/dublin_airport.json"
-    response = requests.get(url)
-    response.raise_for_status()
+# Simplified location data with orientation (direction the shore faces)
+LOCATIONS = {
+    "Skerries Sailing Club": {"orientation": 270},  # west facing
+    "Howth Harbour": {"orientation": 90},          # east facing
+    "Dun Laoghaire": {"orientation": 120}          # south-east facing
+}
 
-    data = response.json()
-    stations = data.get("stations", [])
-    if not stations:
-        return None, None
 
-    station = stations[0]
-    time_items = station.get("timeseries", {}).get("timeItems", [])
-    if not time_items:
-        return None, None
+def is_onshore(orientation, wind_direction):
+    """Return True if wind is onshore for the given orientation."""
+    diff = (wind_direction - orientation) % 360
+    return diff <= 90 or diff >= 270
 
-    latest_observation = time_items[-1]
-    weather_parameters = latest_observation.get("weatherparameters", [])
 
-    wind_speed = None
-    wind_direction = None
+def check_guidelines(location, wind_speed, wind_direction,
+                      novice_students, experienced_students,
+                      senior_instructors, assistant_instructors):
+    reasons = []
+    orientation = LOCATIONS[location]["orientation"]
+    onshore = is_onshore(orientation, wind_direction)
 
-    for param in weather_parameters:
-        if "Wind speed [m/s]" in param:
-            wind_speed = param["Wind speed [m/s]"]
-        if "Wind direction [deg]" in param:
-            wind_direction = param["Wind direction [deg]"]
+    # Wind limits (dummy values as actual PDF not available)
+    if onshore:
+        if novice_students > 0 and wind_speed > 8:
+            reasons.append("Onshore wind speed too high for novices.")
+        if experienced_students > 0 and wind_speed > 10:
+            reasons.append("Onshore wind speed too high for experienced paddlers.")
+    else:  # offshore
+        if novice_students > 0 and wind_speed > 12:
+            reasons.append("Offshore wind speed too high for novices.")
+        if experienced_students > 0 and wind_speed > 14:
+            reasons.append("Offshore wind speed too high for experienced paddlers.")
 
-    return wind_speed, wind_direction
+    # Instructor ratios (dummy values)
+    required_for_novice = (novice_students + 5) // 6
+    required_for_experienced = (experienced_students + 7) // 8
+    required_instructors = max(required_for_novice, required_for_experienced)
 
-def kayaking_decision(wind_speed, wind_direction):
-    if wind_direction is None or wind_speed is None:
-        return "NO DATA", "status-nogo", "No wind data available"
+    total_instructors = senior_instructors + assistant_instructors
 
-    if 0 <= wind_direction < 180:
-        # Northerly winds
-        if wind_speed < 12:
-            return "GO", "status-go", "Northerly winds < 12 m/s"
-        else:
-            return "NO GO", "status-nogo", "Northerly winds ≥ 12 m/s"
-    elif 180 <= wind_direction <= 360:
-        # Southerly winds
-        if wind_speed < 9:
-            return "GO", "status-go", "Southerly winds < 9 m/s"
-        else:
-            return "NO GO", "status-nogo", "Southerly winds ≥ 9 m/s"
-    else:
-        return "NO DATA", "status-nogo", "Invalid wind direction"
+    if total_instructors < required_instructors:
+        reasons.append(
+            f"Need at least {required_instructors} instructors for {novice_students + experienced_students} students.")
 
-@app.route('/')
-def home():
-    wind_speed, wind_direction = fetch_latest_wind_data()
-    status, status_class, decision_rule = kayaking_decision(wind_speed, wind_direction)
+    if novice_students > 0 and senior_instructors < 1:
+        reasons.append("At least one senior instructor required for novice students.")
 
-    return render_template('index.html',
-                           status=status,
-                           status_class=status_class,
-                           wind_speed=wind_speed if wind_speed is not None else "N/A",
-                           wind_direction=wind_direction if wind_direction is not None else "N/A",
-                           decision_rule=decision_rule)
+    if reasons:
+        return "NO GO", reasons
+    return "GO", ["Conditions meet guidelines."]
+
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    decision = None
+    decision_class = ''
+    reasons = []
+
+    if request.method == 'POST':
+        loc = request.form.get('location')
+        wind_speed = float(request.form.get('wind_speed', 0))
+        wind_direction = float(request.form.get('wind_direction', 0))
+        novice_students = int(request.form.get('novice_students', 0))
+        experienced_students = int(request.form.get('experienced_students', 0))
+        senior_instructors = int(request.form.get('senior_instructors', 0))
+        assistant_instructors = int(request.form.get('assistant_instructors', 0))
+
+        decision, reasons = check_guidelines(
+            loc, wind_speed, wind_direction,
+            novice_students, experienced_students,
+            senior_instructors, assistant_instructors)
+
+        decision_class = 'status-go' if decision == 'GO' else 'status-nogo'
+
+    return render_template(
+        'index.html',
+        locations=LOCATIONS.keys(),
+        decision=decision,
+        decision_class=decision_class,
+        reasons=reasons)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

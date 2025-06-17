@@ -1,13 +1,25 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    padding-top: 50px;
+    padding-top: 30px;
     background-color: #f0f8ff;
 }
 
 h1 {
-    font-size: 3em;
+    font-size: 2.5em;
     margin-bottom: 0.5em;
+}
+
+.input-form label {
+    display: inline-block;
+    width: 200px;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.input-form input,
+.input-form select {
+    margin-bottom: 10px;
 }
 
 .status-go {
@@ -18,7 +30,11 @@ h1 {
     color: red;
 }
 
-.details {
-    font-size: 1.2em;
-    margin-top: 20px;
+.reasons {
+    list-style-type: none;
+    padding: 0;
+}
+
+.reasons li {
+    margin: 5px 0;
 }
