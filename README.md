@@ -14,4 +14,4 @@ A simple Flask application that helps water sport instructors evaluate whether c
 3. Open a browser to `http://localhost:5000` and fill in the form.
 
 ## About
-The form allows you to choose a location, specify wind information and list numbers of students and instructors. The app then displays `GO` or `NO GO` with reasons based on basic rules for wind limits and instructor ratios. The rules are illustrative only – replace them with the official guidance from your "Guidance For Instructors" PDF.
+The form allows you to choose a location, enter wind details and participant numbers. The application reads `Locations_onshore_offshore.csv` to determine when the wind is onshore for a location and `Conditions_and_Ratios.csv` for the wind limits and instructor ratios. The result is displayed as `GO` or `NO GO` with the reason and the matched condition category from the CSV data.

@@ -21,11 +21,11 @@
         <label for="wind_direction">Wind direction (deg):</label>
         <input type="number" step="1" min="0" max="360" name="wind_direction" id="wind_direction" required><br>
 
-        <label for="novice_students">Novice students:</label>
-        <input type="number" min="0" name="novice_students" id="novice_students" value="0" required><br>
+        <label for="solo_participants">Solo craft participants:</label>
+        <input type="number" min="0" name="solo_participants" id="solo_participants" value="0" required><br>
 
-        <label for="experienced_students">Experienced students:</label>
-        <input type="number" min="0" name="experienced_students" id="experienced_students" value="0" required><br>
+        <label for="crew_participants">Crew craft participants:</label>
+        <input type="number" min="0" name="crew_participants" id="crew_participants" value="0" required><br>
 
         <label for="senior_instructors">Senior instructors:</label>
         <input type="number" min="0" name="senior_instructors" id="senior_instructors" value="0" required><br>
@@ -38,6 +38,9 @@
 
     {% if decision %}
     <h2 class="{{ decision_class }}">{{ decision }}</h2>
+    {% if condition_name %}
+    <p><strong>Condition category:</strong> {{ condition_name }}</p>
+    {% endif %}
     <ul class="reasons">
         {% for r in reasons %}
         <li>{{ r }}</li>
