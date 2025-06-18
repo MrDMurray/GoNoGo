@@ -15,6 +15,8 @@
             Loading latest weather data from Dublin Airport...
         </div>
         <form method="post" class="input-form">
+            <h3 class="subheading">Environment</h3>
+
             <label for="location">Location:</label>
             <select name="location" id="location">
                 {% for loc in locations %}
@@ -22,13 +24,15 @@
                 {% endfor %}
             </select><br>
 
-            <label for="environment">Environment:</label>
+            <div class="env-container">
+                <label for="environment" id="environment-label">Environment:</label>
+                <div id="env-definition" class="env-definition">{{ env_definitions[form_data.environment] }}</div>
+            </div>
             <select name="environment" id="environment">
                 {% for env in environments %}
                 <option value="{{ env }}" {% if env == form_data.environment %}selected{% endif %}>{{ env }}</option>
                 {% endfor %}
             </select><br>
-            <p id="env-definition" class="env-definition">{{ env_definitions[form_data.environment] }}</p>
 
             <label for="distance">Distance from shore (m):</label>
             <input type="number" step="1" min="0" name="distance" id="distance" value="{{ form_data.distance }}" required><br>

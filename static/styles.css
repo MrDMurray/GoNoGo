@@ -89,10 +89,29 @@ h1 {
     background-color: #0056b3;
 }
 
+.env-container {
+    position: relative;
+    display: inline-block;
+}
+
 .env-definition {
     font-size: 8pt;
     font-style: italic;
-    margin: 5px 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    width: 200px;
+    display: none;
+    z-index: 1000;
+    text-align: left;
+}
+
+.env-container:hover .env-definition {
+    display: block;
 }
 
 .subheading {
