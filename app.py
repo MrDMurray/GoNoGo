@@ -159,19 +159,38 @@ def index():
     decision_class = ''
     reasons = []
 
+    # Default values for the form fields
+    form_data = {
+        'location': next(iter(LOCATIONS.keys())),
+        'environment': next(iter(CONDITIONS.keys())),
+        'distance': 50,
+        'wind_speed': '',
+        'wind_direction': '',
+        'solo_participants': 6,
+        'crew_participants': 0,
+        'coaches': 0,
+    }
+
     if request.method == 'POST':
-        loc = request.form.get('location')
-        env = request.form.get('environment')
-        distance = float(request.form.get('distance', 0))
-        wind_speed = float(request.form.get('wind_speed', 0))
-        wind_direction = float(request.form.get('wind_direction', 0))
-        solo_participants = int(request.form.get('solo_participants', 0))
-        crew_participants = int(request.form.get('crew_participants', 0))
-        coaches = int(request.form.get('coaches', 0))
+        # Preserve submitted values
+        form_data['location'] = request.form.get('location', form_data['location'])
+        form_data['environment'] = request.form.get('environment', form_data['environment'])
+        form_data['distance'] = request.form.get('distance', form_data['distance'])
+        form_data['wind_speed'] = request.form.get('wind_speed', form_data['wind_speed'])
+        form_data['wind_direction'] = request.form.get('wind_direction', form_data['wind_direction'])
+        form_data['solo_participants'] = request.form.get('solo_participants', form_data['solo_participants'])
+        form_data['crew_participants'] = request.form.get('crew_participants', form_data['crew_participants'])
+        form_data['coaches'] = request.form.get('coaches', form_data['coaches'])
 
         decision, reasons = evaluate(
-            loc, env, distance, wind_speed, wind_direction,
-            solo_participants, crew_participants, coaches)
+            form_data['location'],
+            form_data['environment'],
+            float(form_data['distance'] or 0),
+            float(form_data['wind_speed'] or 0),
+            float(form_data['wind_direction'] or 0),
+            int(form_data['solo_participants'] or 0),
+            int(form_data['crew_participants'] or 0),
+            int(form_data['coaches'] or 0))
         decision_class = 'status-go' if decision == 'GO' else 'status-nogo'
 
     return render_template(
@@ -181,10 +200,7 @@ def index():
         decision=decision,
         decision_class=decision_class,
         reasons=reasons,
-        default_distance=50,
-        default_solo=6,
-        default_crew=0,
-        default_coaches=0)
+        form_data=form_data)
 
 
 @app.route('/wind')
