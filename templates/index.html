@@ -17,7 +17,7 @@
             <h2 class="text-center text-5xl font-extrabold {% if decision == 'GO' %}text-green-600{% else %}text-red-600{% endif %} mb-4">{{ decision }}</h2>
             <ul class="list-disc list-inside text-left mb-4">
                 {% for r in reasons %}
-                <li>{{ r }}</li>
+                <li>{{ r|safe }}</li>
                 {% endfor %}
             </ul>
             {% endif %}

@@ -46,3 +46,11 @@ body {
 .env-container:hover .env-definition {
     display: block;
 }
+
+.current-conditions {
+    font-size: 1.25rem;
+}
+
+.subheading {
+    font-size: 1.5rem;
+}
