@@ -49,8 +49,18 @@ h1 {
 }
 
 #wind-arrow {
-    height: 50px;
-    margin-left: 10px;
-    vertical-align: middle;
-    transition: transform 0.5s linear;
-}
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 25%;      /* 3x normal size (assuming default was 32px) */
+            height: auto;
+            opacity: 0.5;
+            z-index: 1000;
+            pointer-events: none;
+            margin: 16px;
+            transition: transform 0.3s;
+        }
+        body {
+            background-size: cover;
+            background-position: center;
+        }
