@@ -88,3 +88,23 @@ h1 {
 .action-btn:hover {
     background-color: #0056b3;
 }
+
+.env-definition {
+    font-size: 8pt;
+    font-style: italic;
+    margin: 5px 0;
+}
+
+.subheading {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.current-conditions-section {
+    margin-top: 10px;
+}
+
+.current-conditions {
+    font-size: 0.9em;
+}
