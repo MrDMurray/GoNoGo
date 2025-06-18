@@ -168,7 +168,7 @@ def index():
         'wind_direction': '',
         'solo_participants': 6,
         'crew_participants': 0,
-        'coaches': 0,
+        'coaches': 1,
     }
 
     if request.method == 'POST':
