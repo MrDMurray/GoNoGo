@@ -8,7 +8,7 @@
 </head>
 <body class="relative text-gray-900">
     <div id="bg-overlay"></div>
-    <img id="wind-arrow" src="http://quacksolution.com/wind_arrow.png" alt="Wind direction arrow" aria-hidden="true">
+    
 
     <div class="flex flex-col items-center pt-8 min-h-screen">
         <h1 class="text-3xl font-bold text-white drop-shadow mb-4">Water Activity GO/NO GO</h1>
@@ -35,7 +35,9 @@
 
                 <div>
                     <div class="env-container">
-                        <label for="environment" id="environment-label" class="block font-medium">Environment</label>
+                        <label for="environment" id="environment-label" class="block font-medium">Environment
+                            <span class="ml-1 text-blue-600 cursor-help">&#9432;</span>
+                        </label>
                         <div id="env-definition" class="env-definition">{{ env_definitions[form_data.environment] }}</div>
                     </div>
                     <select name="environment" id="environment" class="mt-1 w-full p-2 border rounded">
@@ -60,7 +62,6 @@
                     <input type="number" step="1" min="0" max="360" name="wind_direction" id="wind_direction" value="{{ form_data.wind_direction }}" required class="mt-1 w-full p-2 border rounded">
                 </div>
 
-                <h3 class="subheading col-span-full">Participants</h3>
 
                 <div>
                     <label for="solo_participants" class="block font-medium">Solo craft participants</label>
@@ -72,7 +73,6 @@
                     <input type="number" min="0" name="crew_participants" id="crew_participants" value="{{ form_data.crew_participants }}" required class="mt-1 w-full p-2 border rounded">
                 </div>
 
-                <h3 class="subheading col-span-full">Instructors</h3>
 
                 <div>
                     <label for="level1_coaches" class="block font-medium">BCAB Paddlesport/CANI Level 1
@@ -93,12 +93,15 @@
                     <button type="button" id="reload-weather" class="action-btn w-full py-2 px-4 bg-gray-600 text-white rounded">Reload Current Conditions from Met Éireann</button>
                 </div>
 
-                <div id="current-conditions-section" class="current-conditions-section col-span-full mt-4">
-                    <h3 class="subheading">Current Conditions</h3>
-                    <p id="current-conditions" class="current-conditions"></p>
-                </div>
             </form>
             <a href="https://britishcanoeingawarding.org.uk/wp-content/files/01042018BCABEnvironmentalDefinitionsDeploymentGuidanceForInstructorsCoachesLeadersV2-4Jan23.pdf" class="text-blue-700 underline block mt-4">See full BCAB Guidelines here</a>
+        </div>
+        <div id="arrow-container" class="mt-4 flex justify-center">
+            <img id="wind-arrow" src="http://quacksolution.com/wind_arrow.png" alt="Wind direction arrow" aria-hidden="true" class="w-1/3 sm:w-1/4">
+        </div>
+        <div id="current-conditions-section" class="mt-2 text-white font-bold drop-shadow text-center">
+            <h3 class="subheading text-white font-bold drop-shadow">Current Conditions</h3>
+            <p id="current-conditions" class="current-conditions"></p>
         </div>
     </div>
 
