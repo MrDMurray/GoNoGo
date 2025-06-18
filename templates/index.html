@@ -67,6 +67,20 @@
         const locationSelect = document.getElementById('location');
         const windDirInput = document.getElementById('wind_direction');
         const windArrow = document.getElementById('wind-arrow');
+        const windSpeedInput = document.getElementById('wind_speed');
+        const arrowImages = {
+            1: "http://quacksolution.com/force1.png",
+            2: "http://quacksolution.com/force2.png",
+            3: "http://quacksolution.com/force3.png",
+            4: "http://quacksolution.com/force4.png"
+        };
+        function beaufortForce(speed) {
+            if (speed >= 1 && speed <= 5) return 1;
+            if (speed >= 6 && speed <= 11) return 2;
+            if (speed >= 12 && speed <= 19) return 3;
+            if (speed >= 20 && speed <= 28) return 4;
+            return null;
+        }
 
         function updateBackground() {
             const url = locationImages[locationSelect.value];
@@ -77,11 +91,19 @@
 
         function updateWindArrow() {
             const angle = parseFloat(windDirInput.value) || 0;
+            const speed = parseFloat(windSpeedInput.value) || 0;
+            const force = beaufortForce(speed);
+            if (force) {
+                windArrow.src = arrowImages[force];
+            } else {
+                windArrow.src = "http://quacksolution.com/wind_arrow.png";
+            }
             windArrow.style.transform = `rotate(${angle - 180}deg)`;
         }
 
         locationSelect.addEventListener('change', updateBackground);
         windDirInput.addEventListener('input', updateWindArrow);
+        windSpeedInput.addEventListener('input', updateWindArrow);
 
         // Initialize on load
         updateBackground();
