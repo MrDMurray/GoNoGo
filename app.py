@@ -38,6 +38,17 @@ def parse_ratio(value):
     return float(value.split(":", 1)[1])
 
 
+def parse_qual_levels(qual_str):
+    """Return a set of coach levels mentioned in the qualification string."""
+    qual_str = qual_str.lower()
+    levels = set()
+    if "level 1" in qual_str:
+        levels.add(1)
+    if "level 3" in qual_str:
+        levels.add(3)
+    return levels
+
+
 def load_conditions(path="Conditions_and_Ratios.csv"):
     """Return a dict keyed by condition name with limits and ratios."""
     conditions = {}
@@ -47,6 +58,7 @@ def load_conditions(path="Conditions_and_Ratios.csv"):
             op, wind_val = parse_wind_limit(row["Winds"])
             distance_raw = row["Distance from Shore (m)"].strip()
             distance = None if distance_raw.lower() == "any" else float(distance_raw)
+            qualifications = row.get("Coach Minimum Qualifications", row.get("Suggested Minimum Qualifications", ""))
             conditions[row["Conditions"]] = {
                 "wind_op": op,
                 "wind_val": wind_val,
@@ -54,7 +66,8 @@ def load_conditions(path="Conditions_and_Ratios.csv"):
                 "distance": distance,
                 "ratio_solo": parse_ratio(row["Solo Crafe Coach/Leader to Participant ratio"]),
                 "ratio_crew": parse_ratio(row["Crew Crafe Coach/Leader to Participant ratio"]),
-                "qualifications": row["Suggested Minimum Qualifications"],
+                "qualifications": qualifications,
+                "qual_levels": parse_qual_levels(qualifications),
             }
     return conditions
 
@@ -112,7 +125,7 @@ def is_onshore(range_min, range_max, direction):
 
 
 def evaluate(location, environment, distance, wind_speed, wind_dir,
-             solo_participants, crew_participants, coaches):
+             solo_participants, crew_participants, level1_coaches, level3_coaches):
     """Return (GO/NO GO, reasons list) based on CSV guidance."""
     reasons = []
 
@@ -139,7 +152,13 @@ def evaluate(location, environment, distance, wind_speed, wind_dir,
     required_solo = math.ceil(solo_participants / env["ratio_solo"])
     required_crew = math.ceil(crew_participants / env["ratio_crew"])
     required_total = required_solo + required_crew
-    if coaches < required_total:
+
+    if env["qual_levels"] == {3}:
+        available = level3_coaches
+    else:
+        available = level1_coaches + level3_coaches
+
+    if available < required_total:
         reasons.append(
             f"Need at least {required_total} qualified coaches/leaders (solo {env['ratio_solo']} and crew {env['ratio_crew']} ratios).")
         reasons.append(f"Suggested minimum qualifications: {env['qualifications']}")
@@ -168,7 +187,8 @@ def index():
         'wind_direction': '',
         'solo_participants': 6,
         'crew_participants': 0,
-        'coaches': 1,
+        'level1_coaches': 1,
+        'level3_coaches': 0,
     }
 
     if request.method == 'POST':
@@ -180,7 +200,8 @@ def index():
         form_data['wind_direction'] = request.form.get('wind_direction', form_data['wind_direction'])
         form_data['solo_participants'] = request.form.get('solo_participants', form_data['solo_participants'])
         form_data['crew_participants'] = request.form.get('crew_participants', form_data['crew_participants'])
-        form_data['coaches'] = request.form.get('coaches', form_data['coaches'])
+        form_data['level1_coaches'] = request.form.get('level1_coaches', form_data['level1_coaches'])
+        form_data['level3_coaches'] = request.form.get('level3_coaches', form_data['level3_coaches'])
 
         decision, reasons = evaluate(
             form_data['location'],
@@ -190,7 +211,8 @@ def index():
             float(form_data['wind_direction'] or 0),
             int(form_data['solo_participants'] or 0),
             int(form_data['crew_participants'] or 0),
-            int(form_data['coaches'] or 0))
+            int(form_data['level1_coaches'] or 0),
+            int(form_data['level3_coaches'] or 0))
         decision_class = 'status-go' if decision == 'GO' else 'status-nogo'
 
     return render_template(
