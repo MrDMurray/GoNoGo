@@ -3,82 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <title>Activity Safety Check</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body>
-    <!-- Wind arrow overlay -->
-    <img id="wind-arrow" src="http://quacksolution.com/wind_arrow.png" alt="Wind arrow">
+<body class="relative text-gray-900">
+    <div id="bg-overlay"></div>
+    <img id="wind-arrow" src="http://quacksolution.com/wind_arrow.png" alt="Wind direction arrow" aria-hidden="true">
 
-    <div class="form-wrapper">
-        <h1>Water Activity GO/NO GO</h1>
-        <div id="loading-message" class="loading-message" style="display:none;">
-            Loading latest weather data from Dublin Airport...
+    <div class="flex flex-col items-center pt-8 min-h-screen">
+        <h1 class="text-3xl font-bold text-white drop-shadow mb-4">Water Activity GO/NO GO</h1>
+        <div class="form-wrapper bg-white bg-opacity-95 rounded-xl shadow-2xl p-6 sm:p-8 w-11/12 max-w-xl">
+            {% if decision %}
+            <h2 class="text-center text-5xl font-extrabold {% if decision == 'GO' %}text-green-600{% else %}text-red-600{% endif %} mb-4">{{ decision }}</h2>
+            <ul class="list-disc list-inside text-left mb-4">
+                {% for r in reasons %}
+                <li>{{ r }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            <div id="loading-message" class="loading-message hidden mb-4 text-sm italic text-gray-700">Loading latest weather data from Dublin Airport...</div>
+            <form method="post" class="input-form grid gap-4">
+                <div>
+                    <label for="location" class="block font-medium">Location</label>
+                    <select name="location" id="location" class="mt-1 w-full p-2 border rounded">
+                        {% for loc in locations %}
+                        <option value="{{ loc }}" {% if loc == form_data.location %}selected{% endif %}>{{ loc }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <div class="env-container">
+                        <label for="environment" id="environment-label" class="block font-medium">Environment</label>
+                        <div id="env-definition" class="env-definition">{{ env_definitions[form_data.environment] }}</div>
+                    </div>
+                    <select name="environment" id="environment" class="mt-1 w-full p-2 border rounded">
+                        {% for env in environments %}
+                        <option value="{{ env }}" {% if env == form_data.environment %}selected{% endif %}>{{ env }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="distance" class="block font-medium">Distance from shore (m)</label>
+                    <input type="number" step="1" min="0" name="distance" id="distance" value="{{ form_data.distance }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label for="wind_speed" class="block font-medium">Wind speed (km/h)</label>
+                    <input type="number" step="0.1" name="wind_speed" id="wind_speed" value="{{ form_data.wind_speed }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label for="wind_direction" class="block font-medium">Wind direction (deg)</label>
+                    <input type="number" step="1" min="0" max="360" name="wind_direction" id="wind_direction" value="{{ form_data.wind_direction }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <h3 class="subheading col-span-full">Participants</h3>
+
+                <div>
+                    <label for="solo_participants" class="block font-medium">Solo craft participants</label>
+                    <input type="number" min="0" name="solo_participants" id="solo_participants" value="{{ form_data.solo_participants }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label for="crew_participants" class="block font-medium">Crew craft participants</label>
+                    <input type="number" min="0" name="crew_participants" id="crew_participants" value="{{ form_data.crew_participants }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <h3 class="subheading col-span-full">Instructors</h3>
+
+                <div>
+                    <label for="level1_coaches" class="block font-medium">BCAB Paddlesport/CANI Level 1
+                        <span class="ml-1 text-blue-600 cursor-help" title="Number of instructors certified to Level 1">&#9432;</span>
+                    </label>
+                    <input type="number" min="0" name="level1_coaches" id="level1_coaches" value="{{ form_data.level1_coaches }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label for="level3_coaches" class="block font-medium">BCAB Coach/CANI Level 3
+                        <span class="ml-1 text-blue-600 cursor-help" title="Number of instructors certified to Level 3">&#9432;</span>
+                    </label>
+                    <input type="number" min="0" name="level3_coaches" id="level3_coaches" value="{{ form_data.level3_coaches }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <div class="col-span-full flex flex-col sm:flex-row gap-2 mt-2">
+                    <button type="submit" class="action-btn w-full py-2 px-4 bg-blue-600 text-white rounded">Check again with above values</button>
+                    <button type="button" id="reload-weather" class="action-btn w-full py-2 px-4 bg-gray-600 text-white rounded">Reload Current Conditions from Met Éireann</button>
+                </div>
+
+                <div id="current-conditions-section" class="current-conditions-section col-span-full mt-4">
+                    <h3 class="subheading">Current Conditions</h3>
+                    <p id="current-conditions" class="current-conditions"></p>
+                </div>
+            </form>
+            <a href="https://britishcanoeingawarding.org.uk/wp-content/files/01042018BCABEnvironmentalDefinitionsDeploymentGuidanceForInstructorsCoachesLeadersV2-4Jan23.pdf" class="text-blue-700 underline block mt-4">See full BCAB Guidelines here</a>
         </div>
-        <form method="post" class="input-form">
-            <h3 class="subheading">Environment</h3>
-
-            <label for="location">Location:</label>
-            <select name="location" id="location">
-                {% for loc in locations %}
-                <option value="{{ loc }}" {% if loc == form_data.location %}selected{% endif %}>{{ loc }}</option>
-                {% endfor %}
-            </select><br>
-
-            <div class="env-container">
-                <label for="environment" id="environment-label">Environment:</label>
-                <div id="env-definition" class="env-definition">{{ env_definitions[form_data.environment] }}</div>
-            </div>
-            <select name="environment" id="environment">
-                {% for env in environments %}
-                <option value="{{ env }}" {% if env == form_data.environment %}selected{% endif %}>{{ env }}</option>
-                {% endfor %}
-            </select><br>
-
-            <label for="distance">Distance from shore (m):</label>
-            <input type="number" step="1" min="0" name="distance" id="distance" value="{{ form_data.distance }}" required><br>
-
-            <label for="wind_speed">Wind speed (km/h):</label>
-            <input type="number" step="0.1" name="wind_speed" id="wind_speed" value="{{ form_data.wind_speed }}" required><br>
-
-            <label for="wind_direction">Wind direction (deg):</label>
-            <input type="number" step="1" min="0" max="360" name="wind_direction" id="wind_direction" value="{{ form_data.wind_direction }}" required>
-            <br>
-
-            <h3 class="subheading">Participants</h3>
-
-            <label for="solo_participants">Solo craft participants:</label>
-            <input type="number" min="0" name="solo_participants" id="solo_participants" value="{{ form_data.solo_participants }}" required><br>
-
-            <label for="crew_participants">Crew craft participants:</label>
-            <input type="number" min="0" name="crew_participants" id="crew_participants" value="{{ form_data.crew_participants }}" required><br>
-
-            <h3 class="subheading">Instructors</h3>
-
-            <label for="level1_coaches">BCAB Paddlesport/CANI Level 1</label>
-            <input type="number" min="0" name="level1_coaches" id="level1_coaches" value="{{ form_data.level1_coaches }}" required><br>
-
-            <label for="level3_coaches">BCAB Coach/CANI Level 3</label>
-            <input type="number" min="0" name="level3_coaches" id="level3_coaches" value="{{ form_data.level3_coaches }}" required><br>
-
-            <button type="submit" class="action-btn">Check again with above values</button>
-                        <br>
-            <button type="button" id="reload-weather" class="action-btn">Reload Current Conditions from Met Éireann</button>
-
-            <div id="current-conditions-section" class="current-conditions-section">
-                <h3 class="subheading">Current Conditions</h3>
-                <p id="current-conditions" class="current-conditions"></p>
-            </div>
-        </form>
-
-        {% if decision %}
-        <h2 class="{{ decision_class }}">{{ decision }}</h2>
-        <ul class="reasons">
-            {% for r in reasons %}
-            <li>{{ r }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-		<a href="https://britishcanoeingawarding.org.uk/wp-content/files/01042018BCABEnvironmentalDefinitionsDeploymentGuidanceForInstructorsCoachesLeadersV2-4Jan23.pdf">See full BCAB Guidlines here</a>
     </div>
 
     <script>
@@ -172,7 +193,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             {% if not decision %}
             const loading = document.getElementById('loading-message');
-            loading.style.display = 'block';
+            loading.classList.remove('hidden');
             fetch('/wind')
                 .then(r => r.json())
                 .then(data => {
@@ -190,7 +211,7 @@
                 })
                 .finally(() => {
                     setTimeout(() => {
-                        loading.style.display = 'none';
+                        loading.classList.add('hidden');
                         document.querySelector('.input-form').submit();
                     }, 1000);
                 });

@@ -1,99 +1,42 @@
 body {
-    font-family: Arial, sans-serif;
     text-align: center;
-    padding-top: 30px;
-    background-color: #f0f8ff;
+    font-family: Arial, sans-serif;
     background-size: cover;
     background-position: center;
+    min-height: 100vh;
 }
 
-h1 {
-    font-size: 2.5em;
-    margin-bottom: 0.5em;
-}
-
-.input-form label {
-    display: inline-block;
-    width: 200px;
-    text-align: right;
-    margin-right: 10px;
-}
-
-.input-form input,
-.input-form select {
-    margin-bottom: 10px;
-}
-
-.status-go {
-    color: green;
-}
-
-.status-nogo {
-    color: red;
-}
-
-.reasons {
-    list-style-type: none;
-    padding: 0;
-    max-width: 100%;
-}
-
-.reasons li {
-    margin: 5px 0;
-}
-
-.form-wrapper {
-    display: inline-block;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 500px;
-    word-wrap: break-word;
+#bg-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(4px);
+    z-index: 0;
 }
 
 #wind-arrow {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 25%;      /* 3x normal size (assuming default was 32px) */
-            height: auto;
-            opacity: 0.5;
-            z-index: 1000;
-            pointer-events: none;
-            margin: 16px;
-            transition: transform 0.3s;
-        }
-        body {
-            background-size: cover;
-            background-position: center;
-        }
-
-.loading-message {
-    font-size: 0.9em;
-    margin-bottom: 10px;
-    font-style: italic;
-    color: #333;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20%;
+    height: auto;
+    opacity: 0.7;
+    z-index: 50;
+    pointer-events: none;
+    margin: 8px;
+    transition: transform 0.3s;
 }
-
-.action-btn {
-    padding: 8px 16px;
-    margin: 5px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-}
-
-.action-btn:hover {
-    background-color: #0056b3;
+@media (min-width: 600px) {
+    #wind-arrow {
+        width: 25%;
+        margin: 16px;
+    }
 }
 
 .env-container {
     position: relative;
     display: inline-block;
 }
-
 .env-definition {
     font-size: 8pt;
     font-style: italic;
@@ -106,24 +49,9 @@ h1 {
     padding: 5px;
     width: 200px;
     display: none;
-    z-index: 1000;
+    z-index: 100;
     text-align: left;
 }
-
 .env-container:hover .env-definition {
     display: block;
-}
-
-.subheading {
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 5px;
-}
-
-.current-conditions-section {
-    margin-top: 10px;
-}
-
-.current-conditions {
-    font-size: 0.9em;
 }
