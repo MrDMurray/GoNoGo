@@ -48,7 +48,8 @@
             <label for="coaches">Qualified coaches/leaders:</label>
             <input type="number" min="0" name="coaches" id="coaches" value="{{ form_data.coaches }}" required><br>
 
-            <button type="submit">Check</button>
+            <button type="submit" class="action-btn">Check</button>
+            <button type="button" id="reload-weather" class="action-btn">Reload Weather from Met Éireann</button>
         </form>
 
         {% if decision %}
@@ -111,6 +112,12 @@
         // Initialize on load
         updateBackground();
         updateWindArrow();
+        const reloadBtn = document.getElementById('reload-weather');
+        if (reloadBtn) {
+            reloadBtn.addEventListener('click', () => {
+                window.location.href = '/';
+            });
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             {% if not decision %}
