@@ -113,6 +113,7 @@
         updateWindArrow();
 
         window.addEventListener('DOMContentLoaded', () => {
+            {% if not decision %}
             const loading = document.getElementById('loading-message');
             loading.style.display = 'block';
             fetch('/wind')
@@ -135,6 +136,7 @@
                         document.querySelector('.input-form').submit();
                     }, 500);
                 });
+            {% endif %}
         });
     </script>
 </body>
