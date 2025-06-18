@@ -154,8 +154,11 @@ def evaluate(location, environment, distance, wind_speed, wind_dir,
     required_total = required_solo + required_crew
 
     if env["qual_levels"] == {3}:
-        available = level3_coaches
+        if level3_coaches < 1:
+            reasons.append("At least one Level 3 coach is required for this environment.")
+        available = level3_coaches + level1_coaches
     else:
+        # Level 3 coaches are considered qualified for Level 1 environments
         available = level1_coaches + level3_coaches
 
     if available < required_total:
