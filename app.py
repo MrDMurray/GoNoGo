@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import csv
 import math
+import requests
 
 app = Flask(__name__)
 
@@ -60,6 +61,40 @@ def load_conditions(path="Conditions_and_Ratios.csv"):
 
 LOCATIONS = load_locations()
 CONDITIONS = load_conditions()
+
+
+# ------------------------------
+# External data fetch
+# ------------------------------
+
+def fetch_latest_wind_data():
+    """Return (speed_kmh, direction_deg) from Dublin Airport or (None, None)."""
+    url = "https://www.met.ie/Open_Data/json/dublin_airport.json"
+    try:
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+        stations = data.get("stations", [])
+        if not stations:
+            return None, None
+        station = stations[0]
+        time_items = station.get("timeseries", {}).get("timeItems", [])
+        if not time_items:
+            return None, None
+        latest = time_items[-1]
+        params = latest.get("weatherparameters", [])
+        wind_speed = None
+        wind_direction = None
+        for param in params:
+            if "Wind speed [m/s]" in param:
+                wind_speed = param["Wind speed [m/s]"]
+            if "Wind direction [deg]" in param:
+                wind_direction = param["Wind direction [deg]"]
+        if wind_speed is not None:
+            wind_speed = round(wind_speed * 3.6, 1)
+        return wind_speed, wind_direction
+    except Exception:
+        return None, None
 
 
 # ------------------------------
@@ -145,7 +180,20 @@ def index():
         environments=CONDITIONS.keys(),
         decision=decision,
         decision_class=decision_class,
-        reasons=reasons)
+        reasons=reasons,
+        default_distance=50,
+        default_solo=6,
+        default_crew=0,
+        default_coaches=0)
+
+
+@app.route('/wind')
+def wind():
+    """Return latest wind data from Dublin Airport as JSON."""
+    speed, direction = fetch_latest_wind_data()
+    if speed is None or direction is None:
+        return jsonify({'error': 'Failed to fetch data'}), 500
+    return jsonify({'speed': speed, 'direction': direction})
 
 
 if __name__ == '__main__':
