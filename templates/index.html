@@ -45,11 +45,12 @@
             <label for="crew_participants">Crew craft participants:</label>
             <input type="number" min="0" name="crew_participants" id="crew_participants" value="{{ form_data.crew_participants }}" required><br>
 
-            <label for="coaches">Qualified coaches/leaders:</label>
+            <label for="coaches">BCAB Paddlesport/CANI Level 1</label>
             <input type="number" min="0" name="coaches" id="coaches" value="{{ form_data.coaches }}" required><br>
 
-            <button type="submit" class="action-btn">Check</button>
-            <button type="button" id="reload-weather" class="action-btn">Reload Weather from Met Éireann</button>
+            <button type="submit" class="action-btn">Check again with above values</button>
+			<br>
+            <button type="button" id="reload-weather" class="action-btn">Reload Current Conditions from Met Éireann</button>
         </form>
 
         {% if decision %}
@@ -60,6 +61,7 @@
             {% endfor %}
         </ul>
         {% endif %}
+		<a href="https://britishcanoeingawarding.org.uk/wp-content/files/01042018BCABEnvironmentalDefinitionsDeploymentGuidanceForInstructorsCoachesLeadersV2-4Jan23.pdf">See full BCAB Guidlines here</a>
     </div>
 
     <script>
