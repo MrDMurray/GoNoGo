@@ -60,6 +60,7 @@ def load_conditions(path="Conditions_and_Ratios.csv"):
             distance = None if distance_raw.lower() == "any" else float(distance_raw)
             qualifications = row.get("Coach Minimum Qualifications", row.get("Suggested Minimum Qualifications", ""))
             conditions[row["Conditions"]] = {
+                "definition": row["Definition"],
                 "wind_op": op,
                 "wind_val": wind_val,
                 "direction": row["Direction"],
@@ -222,6 +223,7 @@ def index():
         'index.html',
         locations=LOCATIONS.keys(),
         environments=CONDITIONS.keys(),
+        env_definitions={name: data['definition'] for name, data in CONDITIONS.items()},
         decision=decision,
         decision_class=decision_class,
         reasons=reasons,
