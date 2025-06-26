@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body class="relative text-gray-900">
+    <video id="bg-video" autoplay loop muted>
+        <source src="https://quacksolution.com/background.mp4" type="video/mp4">
+    </video>
     <div id="bg-overlay"></div>
     
 
@@ -106,12 +109,6 @@
     </div>
 
     <script>
-        const locationImages = {
-            "Skerries Sailing Club": "http://quacksolution.com/SkerriesSailingClub.jpg",
-            "Skerries South Beach": "http://quacksolution.com/SkerriesSouthBeach.png"
-        };
-
-        const locationSelect = document.getElementById('location');
         const windDirInput = document.getElementById('wind_direction');
         const windArrow = document.getElementById('wind-arrow');
         const windSpeedInput = document.getElementById('wind_speed');
@@ -157,12 +154,6 @@
             document.getElementById('current-conditions').textContent = text;
         }
 
-        function updateBackground() {
-            const url = locationImages[locationSelect.value];
-            if (url) {
-                document.body.style.backgroundImage = `url('${url}')`;
-            }
-        }
 
         function updateWindArrow() {
             const angle = parseFloat(windDirInput.value) || 0;
@@ -176,13 +167,11 @@
             windArrow.style.transform = `rotate(${angle - 180}deg)`;
         }
 
-        locationSelect.addEventListener('change', updateBackground);
         envSelect.addEventListener('change', updateEnvDefinition);
         windDirInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
         windSpeedInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
 
         // Initialize on load
-        updateBackground();
         updateWindArrow();
         updateEnvDefinition();
         updateCurrentConditions();
