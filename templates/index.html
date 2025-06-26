@@ -28,6 +28,12 @@
             <div id="loading-message" class="loading-message hidden mb-4 text-sm italic text-gray-700">Loading latest weather data from Dublin Airport...</div>
             <form method="post" class="input-form grid gap-4">
                 <div>
+                    <label for="forecast-slider" class="block font-medium">Forecast time</label>
+                    <input type="range" id="forecast-slider" min="0" max="0" value="0" class="w-full">
+                    <div id="forecast-time" class="text-center text-sm mt-1"></div>
+                </div>
+
+                <div>
                     <label for="location" class="block font-medium">Location</label>
                     <select name="location" id="location" class="mt-1 w-full p-2 border rounded">
                         {% for loc in locations %}
@@ -112,6 +118,9 @@
         const windDirInput = document.getElementById('wind_direction');
         const windArrow = document.getElementById('wind-arrow');
         const windSpeedInput = document.getElementById('wind_speed');
+        const forecastSlider = document.getElementById('forecast-slider');
+        const forecastTime = document.getElementById('forecast-time');
+        let forecastData = [];
         const arrowImages = {
             1: "http://quacksolution.com/force1.png",
             2: "http://quacksolution.com/force2.png",
@@ -154,6 +163,17 @@
             document.getElementById('current-conditions').textContent = text;
         }
 
+        function applyForecast() {
+            const idx = parseInt(forecastSlider.value);
+            const item = forecastData[idx];
+            if (!item) return;
+            windSpeedInput.value = item.speed;
+            windDirInput.value = item.direction;
+            forecastTime.textContent = new Date(item.dtg).toLocaleString();
+            updateWindArrow();
+            updateCurrentConditions();
+        }
+
 
         function updateWindArrow() {
             const angle = parseFloat(windDirInput.value) || 0;
@@ -170,6 +190,9 @@
         envSelect.addEventListener('change', updateEnvDefinition);
         windDirInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
         windSpeedInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
+        if (forecastSlider) {
+            forecastSlider.addEventListener('input', applyForecast);
+        }
 
         // Initialize on load
         updateWindArrow();
@@ -186,17 +209,17 @@
             {% if not decision %}
             const loading = document.getElementById('loading-message');
             loading.classList.remove('hidden');
-            fetch('/wind')
+            fetch('/forecast')
                 .then(r => r.json())
                 .then(data => {
-                    if (!data.error) {
-                        windSpeedInput.value = data.speed;
-                        windDirInput.value = data.direction;
+                    if (!data.error && data.length) {
+                        forecastData = data;
+                        forecastSlider.max = data.length - 1;
+                        forecastSlider.value = data.length - 1;
+                        applyForecast();
                     } else {
                         loading.textContent = 'Could not load weather data.';
                     }
-                    updateWindArrow();
-                    updateCurrentConditions();
                 })
                 .catch(() => {
                     loading.textContent = 'Could not load weather data.';
