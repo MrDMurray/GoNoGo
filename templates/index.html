@@ -206,7 +206,6 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            {% if not decision %}
             const loading = document.getElementById('loading-message');
             loading.classList.remove('hidden');
             fetch('/forecast')
@@ -227,10 +226,11 @@
                 .finally(() => {
                     setTimeout(() => {
                         loading.classList.add('hidden');
+                        {% if not decision %}
                         document.querySelector('.input-form').submit();
+                        {% endif %}
                     }, 1000);
                 });
-            {% endif %}
         });
     </script>
 </body>
