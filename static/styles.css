@@ -1,111 +1,56 @@
 body {
-    font-family: Arial, sans-serif;
     text-align: center;
-    padding-top: 30px;
-    background-color: #f0f8ff;
+    font-family: Arial, sans-serif;
     background-size: cover;
     background-position: center;
+    min-height: 100vh;
 }
 
-h1 {
-    font-size: 2.5em;
-    margin-bottom: 0.5em;
-}
-
-.input-form label {
-    display: inline-block;
-    width: 200px;
-    text-align: right;
-    margin-right: 10px;
-}
-
-.input-form input,
-.input-form select {
-    margin-bottom: 10px;
-}
-
-.status-go {
-    color: green;
-}
-
-.status-nogo {
-    color: red;
-}
-
-.reasons {
-    list-style-type: none;
-    padding: 0;
-    max-width: 100%;
-}
-
-.reasons li {
-    margin: 5px 0;
-}
-
-.form-wrapper {
-    display: inline-block;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 20px;
-    border-radius: 8px;
-	min-width: 500px;
-    max-width: 800px;
-    word-wrap: break-word;
+#bg-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(4px);
+    z-index: -1;
+    pointer-events: none;
 }
 
 #wind-arrow {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 25%;      /* 3x normal size (assuming default was 32px) */
-            height: auto;
-            opacity: 0.5;
-            z-index: 1000;
-            pointer-events: none;
-            margin: 16px;
-            transition: transform 0.3s;
-        }
-        body {
-            background-size: cover;
-            background-position: center;
-        }
-
-.loading-message {
-    font-size: 0.9em;
-    margin-bottom: 10px;
-    font-style: italic;
-    color: #333;
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+    opacity: 0.8;
+    pointer-events: none;
+    transition: transform 0.3s;
 }
 
-.action-btn {
-    padding: 8px 16px;
-    margin: 5px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
+.env-container {
+    position: relative;
+    display: inline-block;
 }
-
-.action-btn:hover {
-    background-color: #0056b3;
-}
-
 .env-definition {
     font-size: 8pt;
     font-style: italic;
-    margin: 5px 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    width: 200px;
+    display: none;
+    z-index: 100;
+    text-align: left;
 }
-
-.subheading {
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 5px;
-}
-
-.current-conditions-section {
-    margin-top: 10px;
+.env-container:hover .env-definition {
+    display: block;
 }
 
 .current-conditions {
-    font-size: 0.9em;
+    font-size: 1.25rem;
+}
+
+.subheading {
+    font-size: 1.5rem;
 }
