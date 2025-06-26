@@ -193,3 +193,4 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 go.PNG
+static/background.mp4
