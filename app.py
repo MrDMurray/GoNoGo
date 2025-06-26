@@ -111,6 +111,31 @@ def fetch_latest_wind_data():
         return None, None
 
 
+def fetch_forecast_data():
+    """Return list of {'dtg', 'speed', 'direction'} dicts from Dublin Airport."""
+    url = "https://www.met.ie/Open_Data/json/dublin_airport.json"
+    try:
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+        items = data.get("stations", [{}])[0].get("timeseries", {}).get("timeItems", [])
+        forecast = []
+        for it in items:
+            params = it.get("weatherparameters", [])
+            wind_speed = None
+            wind_dir = None
+            for p in params:
+                if "Wind speed [m/s]" in p:
+                    wind_speed = round(p["Wind speed [m/s]"] * 3.6, 1)
+                if "Wind direction [deg]" in p:
+                    wind_dir = p["Wind direction [deg]"]
+            if wind_speed is not None and wind_dir is not None:
+                forecast.append({"dtg": it.get("dtg"), "speed": wind_speed, "direction": wind_dir})
+        return forecast
+    except Exception:
+        return []
+
+
 # ------------------------------
 # Utility functions
 # ------------------------------
@@ -239,6 +264,15 @@ def wind():
     if speed is None or direction is None:
         return jsonify({'error': 'Failed to fetch data'}), 500
     return jsonify({'speed': speed, 'direction': direction})
+
+
+@app.route('/forecast')
+def forecast():
+    """Return hourly forecast data as JSON."""
+    data = fetch_forecast_data()
+    if not data:
+        return jsonify({'error': 'Failed to fetch data'}), 500
+    return jsonify(data)
 
 
 if __name__ == '__main__':
