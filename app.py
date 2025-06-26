@@ -136,7 +136,9 @@ def evaluate(location, environment, distance, wind_speed, wind_dir,
     # Wind direction check
     onshore = is_onshore(loc["min"], loc["max"], wind_dir)
     if env["direction"].lower() == "onshore" and not onshore:
-        reasons.append("Wind direction is not onshore as required.")
+        reasons.append("Wind direction is not onshore as required. Try the South Beach?")
+        if wind_speed < 11:
+            reasons.append("<em>(Special Case: Wind speed is Force 2 or less in Dublin Airport so maybe negligible on site)</em>")
 
     # Wind speed check
     if env["wind_op"] == "<" and not wind_speed < env["wind_val"]:
@@ -240,4 +242,4 @@ def wind():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5004)
+    app.run(debug=True, port=5005)
