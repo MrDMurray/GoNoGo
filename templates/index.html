@@ -38,6 +38,14 @@
                     <label for="forecast-slider" class="block font-medium">Forecast time</label>
                     <input type="range" id="forecast-slider" min="0" max="0" value="0" class="w-full">
                     <div id="forecast-time" class="text-center text-sm mt-1"></div>
+                    <div id="tide-section" class="mt-2 text-sm">
+                        <table id="tide-table" class="tide-table w-full text-left border-collapse">
+                            <thead>
+                                <tr><th class="px-1">Time</th><th class="px-1">Tide</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div>
@@ -121,6 +129,7 @@
         const forecastSlider = document.getElementById('forecast-slider');
         const forecastTime = document.getElementById('forecast-time');
         let forecastData = [];
+        let tideData = [];
         const arrowImages = {
             1: "http://quacksolution.com/force1.png",
             2: "http://quacksolution.com/force2.png",
@@ -129,6 +138,7 @@
         };
         const envDefinitions = {{ env_definitions | tojson }};
         const envSelect = document.getElementById('environment');
+        const tideTableBody = document.querySelector('#tide-table tbody');
 
         function updateEnvDefinition() {
             document.getElementById('env-definition').textContent = envDefinitions[envSelect.value];
@@ -156,6 +166,45 @@
             return dirs[index];
         }
 
+        function getNearestForecastIndex(now) {
+            let idx = 0;
+            let diff = Infinity;
+            forecastData.forEach((item, i) => {
+                const d = Math.abs(new Date(item.dtg) - now);
+                if (d < diff) {
+                    diff = d;
+                    idx = i;
+                }
+            });
+            return idx;
+        }
+
+        function updateTideTable() {
+            if (!tideData.length || !forecastData.length) return;
+            const sel = forecastData[parseInt(forecastSlider.value)];
+            if (!sel) return;
+            const selDate = new Date(sel.dtg);
+            const dateStr = selDate.toISOString().split('T')[0];
+            const dayTides = tideData.filter(t => t.dtg.startsWith(dateStr));
+            dayTides.sort((a,b) => new Date(a.dtg) - new Date(b.dtg));
+            const highlight = [...dayTides]
+                .sort((a,b)=>Math.abs(new Date(a.dtg)-selDate)-Math.abs(new Date(b.dtg)-selDate))
+                .slice(0,2)
+                .map(t=>t.dtg);
+            tideTableBody.innerHTML = '';
+            dayTides.forEach(t => {
+                const tr = document.createElement('tr');
+                if (highlight.includes(t.dtg)) tr.classList.add('highlight-tide');
+                const timeTd = document.createElement('td');
+                timeTd.textContent = new Date(t.dtg).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                const typeTd = document.createElement('td');
+                typeTd.textContent = t.type;
+                tr.appendChild(timeTd);
+                tr.appendChild(typeTd);
+                tideTableBody.appendChild(tr);
+            });
+        }
+
         function updateCurrentConditions() {
             const speed = parseFloat(windSpeedInput.value) || 0;
             const dir = parseFloat(windDirInput.value) || 0;
@@ -172,6 +221,7 @@
             forecastTime.textContent = new Date(item.dtg).toLocaleString();
             updateWindArrow();
             updateCurrentConditions();
+            updateTideTable();
         }
 
 
@@ -191,7 +241,9 @@
         windDirInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
         windSpeedInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
         if (forecastSlider) {
-            forecastSlider.addEventListener('input', applyForecast);
+            forecastSlider.addEventListener('input', () => {
+                applyForecast();
+            });
         }
 
         // Initialize on load
@@ -201,23 +253,33 @@
         const reloadBtn = document.getElementById('reload-weather');
         if (reloadBtn) {
             reloadBtn.addEventListener('click', () => {
-                window.location.href = '/';
+                if (forecastData.length) {
+                    const idx = getNearestForecastIndex(new Date());
+                    forecastSlider.value = idx;
+                    applyForecast();
+                }
             });
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             const loading = document.getElementById('loading-message');
             loading.classList.remove('hidden');
-            fetch('/forecast')
-                .then(r => r.json())
-                .then(data => {
-                    if (!data.error && data.length) {
-                        forecastData = data;
-                        forecastSlider.max = data.length - 1;
-                        forecastSlider.value = data.length - 1;
+            Promise.all([
+                fetch('/forecast').then(r => r.json()),
+                fetch('/tides').then(r => r.json())
+            ])
+                .then(([fData, tData]) => {
+                    if (!fData.error && fData.length) {
+                        forecastData = fData;
+                        forecastSlider.max = fData.length - 1;
+                        forecastSlider.value = getNearestForecastIndex(new Date());
                         applyForecast();
                     } else {
                         loading.textContent = 'Could not load weather data.';
+                    }
+                    if (tData && !tData.error) {
+                        tideData = tData;
+                        updateTideTable();
                     }
                 })
                 .catch(() => {
