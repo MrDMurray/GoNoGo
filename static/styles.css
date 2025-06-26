@@ -64,3 +64,12 @@ body {
 .subheading {
     font-size: 1.5rem;
 }
+
+.tide-table td, .tide-table th {
+    border: 1px solid #ddd;
+    padding: 2px 4px;
+}
+
+.highlight-tide {
+    background-color: #fde68a;
+}

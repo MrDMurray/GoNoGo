@@ -76,6 +76,22 @@ def load_conditions(path="Conditions_and_Ratios.csv"):
 LOCATIONS = load_locations()
 CONDITIONS = load_conditions()
 
+def load_tides(path="static/SkerriesTides.csv"):
+    """Return list of {'location','dtg','type'} dicts for tide predictions."""
+    tides = []
+    try:
+        with open(path, newline="") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if len(row) < 3:
+                    continue
+                tides.append({"location": row[0], "dtg": row[1], "type": row[2]})
+    except FileNotFoundError:
+        pass
+    return tides
+
+TIDES = load_tides()
+
 
 # ------------------------------
 # External data fetch
@@ -273,6 +289,12 @@ def forecast():
     if not data:
         return jsonify({'error': 'Failed to fetch data'}), 500
     return jsonify(data)
+
+
+@app.route('/tides')
+def tides():
+    """Return tide prediction data as JSON."""
+    return jsonify(TIDES)
 
 
 if __name__ == '__main__':
