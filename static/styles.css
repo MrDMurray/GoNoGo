@@ -1,6 +1,5 @@
 html {
-    /* Use a modest base font size for better hierarchy */
-    font-size: 125%;
+    font-size: 200%;
 }
 
 body {
@@ -26,9 +25,7 @@ body {
 #bg-overlay {
     position: fixed;
     inset: 0;
-    /* Tint overlay the same shade as the video background so
-       the letterbox colour isn't lost once styles load */
-    background: rgba(46, 83, 125, 0.45);
+    background: rgba(0,0,0,0.3);
     backdrop-filter: blur(0px);
     z-index: -1;
     pointer-events: none;
@@ -85,7 +82,7 @@ body {
 }
 
 .tide-table {
-    font-size: 1.25em;
+    font-size: 2em;
 }
 
 input[type="range"]::-webkit-slider-thumb {
