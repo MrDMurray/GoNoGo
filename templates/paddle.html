@@ -23,6 +23,14 @@
             <p id="current-conditions" class="current-conditions"></p>
         </div>
         <div class="form-wrapper bg-white bg-opacity-95 rounded-xl shadow-2xl p-6 sm:p-8 w-11/12 max-w-xl">
+            {% if decision %}
+            <h2 class="text-center text-5xl font-extrabold {% if decision == 'GO' %}text-green-600{% else %}text-red-600{% endif %} mb-4">{{ decision }}</h2>
+            <ul class="list-disc list-inside text-left mb-4">
+                {% for r in reasons %}
+                <li>{{ r|safe }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
 
             <form method="post" class="input-form grid gap-4">
                 <div>
@@ -48,24 +56,75 @@
                     </select>
                 </div>
 
-                <!-- Simplified on home page -->
+                <div>
+                    <div class="env-container">
+                        <label for="environment" id="environment-label" class="block font-medium">Environment
+                            <span class="ml-1 text-blue-600 cursor-help">&#9432;</span>
+                        </label>
+                        <div id="env-definition" class="env-definition">{{ env_definitions[form_data.environment] }}</div>
+                    </div>
+                    <select name="environment" id="environment" class="mt-1 w-full p-2 border rounded">
+                        {% for env in environments %}
+                        <option value="{{ env }}" {% if env == form_data.environment %}selected{% endif %}>{{ env }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="distance" class="block font-medium">Distance from shore (m)</label>
+                    <input type="number" step="1" min="0" name="distance" id="distance" value="{{ form_data.distance }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label for="wind_speed" class="block font-medium">Wind speed (km/h)</label>
+                    <input type="number" step="0.1" name="wind_speed" id="wind_speed" value="{{ form_data.wind_speed }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label for="wind_direction" class="block font-medium">Wind direction (deg)</label>
+                    <input type="number" step="1" min="0" max="360" name="wind_direction" id="wind_direction" value="{{ form_data.wind_direction }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+
+                <div>
+                    <label for="solo_participants" class="block font-medium">Solo craft participants</label>
+                    <input type="number" min="0" name="solo_participants" id="solo_participants" value="{{ form_data.solo_participants }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label for="crew_participants" class="block font-medium">Crew craft participants</label>
+                    <input type="number" min="0" name="crew_participants" id="crew_participants" value="{{ form_data.crew_participants }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+
+                <div>
+                    <label for="level1_coaches" class="block font-medium">BCAB Paddlesport/CANI Level 1
+                        <span class="ml-1 text-blue-600 cursor-help" title="Number of instructors certified to Level 1">&#9432;</span>
+                    </label>
+                    <input type="number" min="0" name="level1_coaches" id="level1_coaches" value="{{ form_data.level1_coaches }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label for="level3_coaches" class="block font-medium">BCAB Coach/CANI Level 3
+                        <span class="ml-1 text-blue-600 cursor-help" title="Number of instructors certified to Level 3">&#9432;</span>
+                    </label>
+                    <input type="number" min="0" name="level3_coaches" id="level3_coaches" value="{{ form_data.level3_coaches }}" required class="mt-1 w-full p-2 border rounded">
+                </div>
+
+                <div class="col-span-full flex flex-col sm:flex-row gap-2 mt-2">
+                    <button type="submit" class="action-btn w-full py-2 px-4 bg-blue-600 text-white rounded">Check again with above values</button>
+                    <button type="button" id="reload-weather" class="action-btn w-full py-2 px-4 bg-gray-600 text-white rounded">Reload Current Conditions from Met Éireann</button>
+                </div>
 
             </form>
             <a href="https://britishcanoeingawarding.org.uk/wp-content/files/01042018BCABEnvironmentalDefinitionsDeploymentGuidanceForInstructorsCoachesLeadersV2-4Jan23.pdf" class="text-blue-700 underline block mt-4">See full BCAB Guidelines here</a>
         </div>
     </div>
 
-    <div class="grid grid-cols-4 gap-2 my-4 w-11/12 max-w-xl mx-auto">
-        <a href="/paddle"><img src="https://quacksolution.com/paddle.png" alt="Paddle" class="w-full h-auto"></a>
-        <a href="/row"><img src="https://quacksolution.com/row.png" alt="Row" class="w-full h-auto"></a>
-        <a href="/swim"><img src="https://quacksolution.com/swim.png" alt="Swim" class="w-full h-auto"></a>
-        <a href="/sail"><img src="https://quacksolution.com/sail.png" alt="Sail" class="w-full h-auto"></a>
-    </div>
-
     <script>
-        const windDirInput = document.getElementById('wind_direction') || {value: 0};
+        const windDirInput = document.getElementById('wind_direction');
         const windArrow = document.getElementById('wind-arrow');
-        const windSpeedInput = document.getElementById('wind_speed') || {value: 0};
+        const windSpeedInput = document.getElementById('wind_speed');
         const forecastSlider = document.getElementById('forecast-slider');
         const forecastTime = document.getElementById('forecast-time');
         let forecastData = [];
@@ -81,9 +140,7 @@
         const tideTableBody = document.querySelector('#tide-table tbody');
 
         function updateEnvDefinition() {
-            if (envSelect) {
-                document.getElementById('env-definition').textContent = envDefinitions[envSelect.value];
-            }
+            document.getElementById('env-definition').textContent = envDefinitions[envSelect.value];
         }
         function beaufortForce(speed) {
             if (speed >= 1 && speed <= 5) return 1;
@@ -186,9 +243,9 @@
             windArrow.style.transform = `rotate(${angle - 180}deg)`;
         }
 
-        if (envSelect) envSelect.addEventListener('change', updateEnvDefinition);
-        if (windDirInput.addEventListener) windDirInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
-        if (windSpeedInput.addEventListener) windSpeedInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
+        envSelect.addEventListener('change', updateEnvDefinition);
+        windDirInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
+        windSpeedInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
         if (forecastSlider) {
             forecastSlider.addEventListener('input', () => {
                 applyForecast();
