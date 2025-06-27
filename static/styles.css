@@ -19,7 +19,7 @@ body {
     height: 100%;
     object-fit: cover;
     z-index: -2;
-	background-color: blue; /* color for letterbox areas */
+    background-color: #2e537d; /* color for letterbox areas */
 }
 
 #bg-overlay {
@@ -74,6 +74,7 @@ body {
 .tide-table td, .tide-table th {
     border: 1px solid #ddd;
     padding: 2px 4px;
+    text-align: center;
 }
 
 .highlight-tide {
@@ -85,10 +86,10 @@ body {
 }
 
 input[type="range"]::-webkit-slider-thumb {
-    width: 25px;
-    height: 25px;
+    width: 35px;
+    height: 35px;
 }
 input[type="range"]::-moz-range-thumb {
-    width: 25px;
-    height: 25px;
+    width: 35px;
+    height: 35px;
 }
