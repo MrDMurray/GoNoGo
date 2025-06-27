@@ -39,14 +39,6 @@
                     </div>
                 </div>
 
-                <div>
-                    <label for="location" class="block font-medium">Location</label>
-                    <select name="location" id="location" class="mt-1 w-full p-2 border rounded">
-                        {% for loc in locations %}
-                        <option value="{{ loc }}" {% if loc == form_data.location %}selected{% endif %}>{{ loc }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
 
                 <!-- Simplified on home page -->
 
