@@ -222,7 +222,9 @@
             if (!item) return;
             windSpeedInput.value = item.speed;
             windDirInput.value = item.direction;
-            forecastTime.textContent = new Date(item.dtg).toLocaleString();
+            const dt = new Date(item.dtg);
+            const weekday = dt.toLocaleDateString('en-US', {weekday: 'long'});
+            forecastTime.textContent = `${weekday} ${dt.toLocaleString()}`;
             updateWindArrow();
             updateCurrentConditions();
             updateTideTable();
