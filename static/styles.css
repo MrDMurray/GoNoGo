@@ -19,6 +19,7 @@ body {
     height: 100%;
     object-fit: cover;
     z-index: -2;
+    background-color: blue; /* color for letterbox areas */
 }
 
 #bg-overlay {
