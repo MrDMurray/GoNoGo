@@ -32,7 +32,6 @@
             </ul>
             {% endif %}
 
-            <div id="loading-message" class="loading-message hidden mb-4 text-sm italic text-gray-700">Loading latest weather data from Dublin Airport...</div>
             <form method="post" class="input-form grid gap-4">
                 <div>
                     <label for="forecast-slider" class="block font-medium">Forecast time</label>
@@ -180,10 +179,15 @@
         }
 
         function updateTideTable() {
-            if (!tideData.length || !forecastData.length) return;
-            const sel = forecastData[parseInt(forecastSlider.value)];
-            if (!sel) return;
-            const selDate = new Date(sel.dtg);
+            if (!tideData.length) return;
+            let selDate = null;
+            if (forecastData.length) {
+                const sel = forecastData[parseInt(forecastSlider.value)];
+                if (sel) selDate = new Date(sel.dtg);
+            }
+            if (!selDate) {
+                selDate = new Date(tideData[0].dtg);
+            }
             const dateStr = selDate.toISOString().split('T')[0];
             const dayTides = tideData.filter(t => t.dtg.startsWith(dateStr));
             dayTides.sort((a,b) => new Date(a.dtg) - new Date(b.dtg));
@@ -263,7 +267,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             const loading = document.getElementById('loading-message');
-            loading.classList.remove('hidden');
+            if (loading) loading.classList.remove('hidden');
             Promise.all([
                 fetch('/forecast').then(r => r.json()),
                 fetch('/tides').then(r => r.json())
@@ -274,7 +278,7 @@
                         forecastSlider.max = fData.length - 1;
                         forecastSlider.value = getNearestForecastIndex(new Date());
                         applyForecast();
-                    } else {
+                    } else if (loading) {
                         loading.textContent = 'Could not load weather data.';
                     }
                     if (tData && !tData.error) {
@@ -283,11 +287,11 @@
                     }
                 })
                 .catch(() => {
-                    loading.textContent = 'Could not load weather data.';
+                    if (loading) loading.textContent = 'Could not load weather data.';
                 })
                 .finally(() => {
                     setTimeout(() => {
-                        loading.classList.add('hidden');
+                        if (loading) loading.classList.add('hidden');
                         {% if not decision %}
                         document.querySelector('.input-form').submit();
                         {% endif %}
