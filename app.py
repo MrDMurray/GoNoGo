@@ -219,8 +219,7 @@ def evaluate(location, environment, distance, wind_speed, wind_dir,
 # Routes
 # ------------------------------
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+def render_activity(template, autosubmit=True):
     decision = None
     decision_class = ''
     reasons = []
@@ -263,14 +262,40 @@ def index():
         decision_class = 'status-go' if decision == 'GO' else 'status-nogo'
 
     return render_template(
-        'index.html',
+        template,
         locations=LOCATIONS.keys(),
         environments=CONDITIONS.keys(),
         env_definitions={name: data['definition'] for name, data in CONDITIONS.items()},
         decision=decision,
         decision_class=decision_class,
         reasons=reasons,
-        form_data=form_data)
+        form_data=form_data,
+        autosubmit=autosubmit)
+
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    return render_activity('index.html', autosubmit=False)
+
+
+@app.route('/paddle', methods=['GET', 'POST'])
+def paddle():
+    return render_activity('paddle.html')
+
+
+@app.route('/swim', methods=['GET', 'POST'])
+def swim():
+    return render_activity('swim.html')
+
+
+@app.route('/row', methods=['GET', 'POST'])
+def row_page():  # avoid conflict with row function maybe
+    return render_activity('row.html')
+
+
+@app.route('/sail', methods=['GET', 'POST'])
+def sail():
+    return render_activity('sail.html')
 
 
 @app.route('/wind')
