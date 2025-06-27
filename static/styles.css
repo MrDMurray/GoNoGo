@@ -76,7 +76,11 @@ body {
 }
 
 .highlight-tide {
-    background-color: #fde68a;
+    background-color: #bfdbfe;
+}
+
+.tide-table {
+    font-size: 2em;
 }
 
 input[type="range"]::-webkit-slider-thumb {
