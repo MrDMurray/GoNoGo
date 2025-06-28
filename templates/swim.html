@@ -23,14 +23,6 @@
             <p id="current-conditions" class="current-conditions"></p>
         </div>
         <div class="form-wrapper bg-white bg-opacity-95 rounded-xl shadow-2xl p-6 sm:p-8 w-11/12 max-w-xl">
-            {% if decision %}
-            <h2 class="text-center text-5xl font-extrabold {% if decision == 'GO' %}text-green-600{% else %}text-red-600{% endif %} mb-4">{{ decision }}</h2>
-            <ul class="list-disc list-inside text-left mb-4">
-                {% for r in reasons %}
-                <li>{{ r|safe }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
 
             <form method="post" class="input-form grid gap-4">
                 <div>
@@ -56,65 +48,48 @@
                     </select>
                 </div>
 
+
                 <div>
-                    <div class="env-container">
-                        <label for="environment" id="environment-label" class="block font-medium">Environment
-                            <span class="ml-1 text-blue-600 cursor-help">&#9432;</span>
-                        </label>
-                        <div id="env-definition" class="env-definition">{{ env_definitions[form_data.environment] }}</div>
-                    </div>
-                    <select name="environment" id="environment" class="mt-1 w-full p-2 border rounded">
-                        {% for env in environments %}
-                        <option value="{{ env }}" {% if env == form_data.environment %}selected{% endif %}>{{ env }}</option>
-                        {% endfor %}
-                    </select>
+                    <label class="block font-medium">Wind speed (km/h)</label>
+                    <p id="wind_speed" class="mt-1">{{ form_data.wind_speed }}</p>
                 </div>
 
                 <div>
-                    <label for="distance" class="block font-medium">Distance from shore (m)</label>
-                    <input type="number" step="1" min="0" name="distance" id="distance" value="{{ form_data.distance }}" required class="mt-1 w-full p-2 border rounded">
+                    <label class="block font-medium">Wind direction (deg)</label>
+                    <p id="wind_direction" class="mt-1">{{ form_data.wind_direction }}</p>
                 </div>
 
                 <div>
-                    <label for="wind_speed" class="block font-medium">Wind speed (km/h)</label>
-                    <input type="number" step="0.1" name="wind_speed" id="wind_speed" value="{{ form_data.wind_speed }}" required class="mt-1 w-full p-2 border rounded">
+                    <label class="block font-medium">Wave Conditions</label>
+                    <p id="wave_conditions" class="mt-1">-</p>
                 </div>
 
                 <div>
-                    <label for="wind_direction" class="block font-medium">Wind direction (deg)</label>
-                    <input type="number" step="1" min="0" max="360" name="wind_direction" id="wind_direction" value="{{ form_data.wind_direction }}" required class="mt-1 w-full p-2 border rounded">
-                </div>
-
-
-                <div>
-                    <label for="solo_participants" class="block font-medium">Solo craft participants</label>
-                    <input type="number" min="0" name="solo_participants" id="solo_participants" value="{{ form_data.solo_participants }}" required class="mt-1 w-full p-2 border rounded">
+                    <label class="block font-medium">Water Quality</label>
+                    <p id="water_quality" class="mt-1">-</p>
                 </div>
 
                 <div>
-                    <label for="crew_participants" class="block font-medium">Crew craft participants</label>
-                    <input type="number" min="0" name="crew_participants" id="crew_participants" value="{{ form_data.crew_participants }}" required class="mt-1 w-full p-2 border rounded">
-                </div>
-
-
-                <div>
-                    <label for="level1_coaches" class="block font-medium">BCAB Paddlesport/CANI Level 1
-                        <span class="ml-1 text-blue-600 cursor-help" title="Number of instructors certified to Level 1">&#9432;</span>
-                    </label>
-                    <input type="number" min="0" name="level1_coaches" id="level1_coaches" value="{{ form_data.level1_coaches }}" required class="mt-1 w-full p-2 border rounded">
+                    <label class="block font-medium">Sea Temperature</label>
+                    <p id="sea_temperature" class="mt-1">-</p>
                 </div>
 
                 <div>
-                    <label for="level3_coaches" class="block font-medium">BCAB Coach/CANI Level 3
-                        <span class="ml-1 text-blue-600 cursor-help" title="Number of instructors certified to Level 3">&#9432;</span>
-                    </label>
-                    <input type="number" min="0" name="level3_coaches" id="level3_coaches" value="{{ form_data.level3_coaches }}" required class="mt-1 w-full p-2 border rounded">
+                    <label class="block font-medium">Air Temperature</label>
+                    <p id="air_temperature" class="mt-1">-</p>
                 </div>
 
-                <div class="col-span-full flex flex-col sm:flex-row gap-2 mt-2">
-                    <button type="submit" class="action-btn w-full py-2 px-4 bg-blue-600 text-white rounded">Check again with above values</button>
-                    <button type="button" id="reload-weather" class="action-btn w-full py-2 px-4 bg-gray-600 text-white rounded">Reload Current Conditions from Met Éireann</button>
+                <div>
+                    <label class="block font-medium">Sunset</label>
+                    <p id="sunset" class="mt-1">-</p>
                 </div>
+
+                <div>
+                    <label class="block font-medium">Sunrise</label>
+                    <p id="sunrise" class="mt-1">-</p>
+                </div>
+
+
 
             </form>
             <a href="https://britishcanoeingawarding.org.uk/wp-content/files/01042018BCABEnvironmentalDefinitionsDeploymentGuidanceForInstructorsCoachesLeadersV2-4Jan23.pdf" class="text-blue-700 underline block mt-4">See full BCAB Guidelines here</a>
@@ -136,13 +111,7 @@
             3: "http://quacksolution.com/force3.png",
             4: "http://quacksolution.com/force4.png"
         };
-        const envDefinitions = {{ env_definitions | tojson }};
-        const envSelect = document.getElementById('environment');
         const tideTableBody = document.querySelector('#tide-table tbody');
-
-        function updateEnvDefinition() {
-            document.getElementById('env-definition').textContent = envDefinitions[envSelect.value];
-        }
         function beaufortForce(speed) {
             if (speed >= 1 && speed <= 5) return 1;
             if (speed >= 6 && speed <= 11) return 2;
@@ -211,8 +180,8 @@
         }
 
         function updateCurrentConditions() {
-            const speed = parseFloat(windSpeedInput.value) || 0;
-            const dir = parseFloat(windDirInput.value) || 0;
+        const speed = parseFloat(windSpeedInput.textContent) || 0;
+        const dir = parseFloat(windDirInput.textContent) || 0;
             const text = `${speed} km/h from ${cardinalDirection(dir)} - ${beaufortForceDescription(speed)}`;
             document.getElementById('current-conditions').textContent = text;
         }
@@ -221,8 +190,8 @@
             const idx = parseInt(forecastSlider.value);
             const item = forecastData[idx];
             if (!item) return;
-            windSpeedInput.value = item.speed;
-            windDirInput.value = item.direction;
+            windSpeedInput.textContent = item.speed;
+            windDirInput.textContent = item.direction;
             const dt = new Date(item.dtg);
             const weekday = dt.toLocaleDateString('en-US', {weekday: 'long'});
             forecastTime.textContent = `${weekday} ${dt.toLocaleString()}`;
@@ -233,8 +202,8 @@
 
 
         function updateWindArrow() {
-            const angle = parseFloat(windDirInput.value) || 0;
-            const speed = parseFloat(windSpeedInput.value) || 0;
+            const angle = parseFloat(windDirInput.textContent) || 0;
+            const speed = parseFloat(windSpeedInput.textContent) || 0;
             const force = beaufortForce(speed);
             if (force) {
                 windArrow.src = arrowImages[force];
@@ -244,9 +213,6 @@
             windArrow.style.transform = `rotate(${angle - 180}deg)`;
         }
 
-        envSelect.addEventListener('change', updateEnvDefinition);
-        windDirInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
-        windSpeedInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
         if (forecastSlider) {
             forecastSlider.addEventListener('input', () => {
                 applyForecast();
@@ -255,18 +221,7 @@
 
         // Initialize on load
         updateWindArrow();
-        updateEnvDefinition();
         updateCurrentConditions();
-        const reloadBtn = document.getElementById('reload-weather');
-        if (reloadBtn) {
-            reloadBtn.addEventListener('click', () => {
-                if (forecastData.length) {
-                    const idx = getNearestForecastIndex(new Date());
-                    forecastSlider.value = idx;
-                    applyForecast();
-                }
-            });
-        }
 
         window.addEventListener('DOMContentLoaded', () => {
             const loading = document.getElementById('loading-message');
@@ -295,9 +250,6 @@
                 .finally(() => {
                     setTimeout(() => {
                         if (loading) loading.classList.add('hidden');
-                        {% if autosubmit and not decision %}
-                        document.querySelector('.input-form').submit();
-                        {% endif %}
                     }, 1000);
                 });
         });
