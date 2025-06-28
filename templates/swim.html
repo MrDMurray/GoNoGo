@@ -31,7 +31,7 @@
                     <div id="forecast-time" class="text-center text-1xl sm:text-2xl w-full mt-1"></div>
 					<input type="range" id="forecast-slider" min="0" max="0" value="0" class="w-full">
                     <div id="tide-section" class="mt-2">
-                        <table id="tide-table" class="tide-table w-full text-left border-collapse text-2xl">
+                        <table id="tide-table" class="tide-table w-full text-left border-collapse text-lg">
                             <thead>
                                 <tr><th class="px-1">Time</th><th class="px-1">Tide</th></tr>
                             </thead>
@@ -45,42 +45,42 @@
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Wind (km/h)</label>
+                        <label class="block font-medium sm:text-sm">Wind (km/h)</label>
                         <p id="wind_speed" class="mt-1">{{ form_data.wind_speed }}</p>
                     </div>
 
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Wind (deg)</label>
+                        <label class="block font-medium sm:text-sm">Wind (deg)</label>
                         <p id="wind_direction" class="mt-1">{{ form_data.wind_direction }}</p>
                     </div>
 
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Waves</label>
+                        <label class="block font-medium sm:text-sm">Waves</label>
                         <p id="wave_conditions" class="mt-1">-</p>
                     </div>
 
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Water Quality</label>
-                        <p id="water_quality" class="mt-1">-</p>
+                        <label class="block font-medium sm:text-sm">Water Quality </label>
+                        <p id="water_quality" class="mt-1 sm:text-sm">-</p>
                     </div>
 
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Sea Temp</label>
+                        <label class="block font-medium sm:text-sm">Sea Temp</label>
                         <p id="sea_temperature" class="mt-1">-</p>
                     </div>
 
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Air Temp</label>
+                        <label class="block font-medium sm:text-sm">Air Temp</label>
                         <p id="air_temperature" class="mt-1">-</p>
                     </div>
 
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Sunset</label>
+                        <label class="block font-medium sm:text-sm">Sunset</label>
                         <p id="sunset" class="mt-1">-</p>
                     </div>
 
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Sunrise</label>
+                        <label class="block font-medium sm:text-sm">Sunrise</label>
                         <p id="sunrise" class="mt-1">-</p>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
         </div>
         <div class="mt-4 text-center">
             <a href="/">
-                <img src="http://quacksolution.com/home.png" alt="Home" width="50" height="50" class="mx-auto">
+                <img src="http://quacksolution.com/home.png" alt="Home" width="100" height="100" class="mx-auto">
             </a>
         </div>
     </div>
