@@ -26,11 +26,12 @@
 
             <form method="post" class="input-form grid gap-4">
                 <div>
-                    <label for="forecast-slider" class="block font-medium">Forecast time</label>
-                    <input type="range" id="forecast-slider" min="0" max="0" value="0" class="w-full">
-                    <div id="forecast-time" class="text-center text-sm mt-1"></div>
-                    <div id="tide-section" class="mt-2 text-sm">
-                        <table id="tide-table" class="tide-table w-full text-left border-collapse">
+                    
+                    
+                    <div id="forecast-time" class="text-center text-1xl sm:text-2xl w-full mt-1"></div>
+					<input type="range" id="forecast-slider" min="0" max="0" value="0" class="w-full">
+                    <div id="tide-section" class="mt-2">
+                        <table id="tide-table" class="tide-table w-full text-left border-collapse text-2xl">
                             <thead>
                                 <tr><th class="px-1">Time</th><th class="px-1">Tide</th></tr>
                             </thead>
@@ -39,29 +40,22 @@
                     </div>
                 </div>
 
-                <div>
-                    <label for="location" class="block font-medium">Location</label>
-                    <select name="location" id="location" class="mt-1 w-full p-2 border rounded">
-                        {% for loc in locations %}
-                        <option value="{{ loc }}" {% if loc == form_data.location %}selected{% endif %}>{{ loc }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+
 
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Wind speed (km/h)</label>
+                        <label class="block font-medium">Wind (km/h)</label>
                         <p id="wind_speed" class="mt-1">{{ form_data.wind_speed }}</p>
                     </div>
 
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Wind direction (deg)</label>
+                        <label class="block font-medium">Wind (deg)</label>
                         <p id="wind_direction" class="mt-1">{{ form_data.wind_direction }}</p>
                     </div>
 
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Wave Conditions</label>
+                        <label class="block font-medium">Waves</label>
                         <p id="wave_conditions" class="mt-1">-</p>
                     </div>
 
@@ -71,12 +65,12 @@
                     </div>
 
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Sea Temperature</label>
+                        <label class="block font-medium">Sea Temp</label>
                         <p id="sea_temperature" class="mt-1">-</p>
                     </div>
 
                     <div class="p-2 bg-blue-50 rounded shadow">
-                        <label class="block font-medium">Air Temperature</label>
+                        <label class="block font-medium">Air Temp</label>
                         <p id="air_temperature" class="mt-1">-</p>
                     </div>
 
@@ -94,7 +88,6 @@
 
 
             </form>
-            <a href="https://britishcanoeingawarding.org.uk/wp-content/files/01042018BCABEnvironmentalDefinitionsDeploymentGuidanceForInstructorsCoachesLeadersV2-4Jan23.pdf" class="text-blue-700 underline block mt-4">See full BCAB Guidelines here</a>
             <a href="/" class="text-blue-700 underline block mt-2">Return to Home</a>
         </div>
     </div>
