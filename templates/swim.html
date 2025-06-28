@@ -86,7 +86,7 @@
                 </div>
                 <br>   
                 <label class="block font-medium sm:text-sm">Change date:</label>
-                <input type="datetime-local" id="forecast-picker" class="w-full">
+                <select id="forecast-picker" size="5" class="scroll-wheel w-full"></select>
             </form>
         </div>
         <div class="mt-4 text-center">
@@ -104,6 +104,16 @@
         const forecastTime = document.getElementById('forecast-time');
         let forecastData = [];
         let tideData = [];
+        function populateForecastOptions(data) {
+            forecastPicker.innerHTML = "";
+            data.forEach(item => {
+                const dt = new Date(item.dtg);
+                const opt = document.createElement("option");
+                opt.value = dt.toISOString().slice(0,16);
+                opt.textContent = dt.toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"}) + " " + dt.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+                forecastPicker.appendChild(opt);
+            });
+        }
         const waterQualityEl = document.getElementById('water_quality');
         let seaTemps = JSON.parse(localStorage.getItem('seaTemps') || 'null');
         let sunTimes = JSON.parse(localStorage.getItem('sunTimes') || 'null');
@@ -309,8 +319,7 @@
                 .then(([fData, tData, marine, sun, quality]) => {
                     if (!fData.error && fData.length) {
                         forecastData = fData;
-                        forecastPicker.min = new Date(fData[0].dtg).toISOString().slice(0,16);
-                        forecastPicker.max = new Date(fData[fData.length - 1].dtg).toISOString().slice(0,16);
+                          populateForecastOptions(forecastData);
                         const idx = getNearestForecastIndex(new Date());
                         forecastPicker.value = new Date(fData[idx].dtg).toISOString().slice(0,16);
                         applyForecast();

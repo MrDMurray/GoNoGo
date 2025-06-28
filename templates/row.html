@@ -35,7 +35,7 @@
             <form method="post" class="input-form grid gap-4">
                 <div>
                     <label for="forecast-picker" class="block font-medium">Forecast time</label>
-                    <input type="datetime-local" id="forecast-picker" class="w-full">
+                    <select id="forecast-picker" size="5" class="scroll-wheel w-full"></select>
                     <div id="forecast-time" class="text-center text-sm mt-1"></div>
                     <div id="tide-section" class="mt-2 text-sm">
                         <table id="tide-table" class="tide-table w-full text-left border-collapse">
@@ -134,6 +134,16 @@
         const forecastTime = document.getElementById('forecast-time');
         let forecastData = [];
         let tideData = [];
+        function populateForecastOptions(data) {
+            forecastPicker.innerHTML = "";
+            data.forEach(item => {
+                const dt = new Date(item.dtg);
+                const opt = document.createElement("option");
+                opt.value = dt.toISOString().slice(0,16);
+                opt.textContent = dt.toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"}) + " " + dt.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+                forecastPicker.appendChild(opt);
+            });
+        }
         const arrowImages = {
             1: "http://quacksolution.com/force1.png",
             2: "http://quacksolution.com/force2.png",
@@ -284,8 +294,8 @@
                 .then(([fData, tData]) => {
                     if (!fData.error && fData.length) {
                         forecastData = fData;
-                        forecastPicker.min = new Date(fData[0].dtg).toISOString().slice(0,16);
-                        forecastPicker.max = new Date(fData[fData.length - 1].dtg).toISOString().slice(0,16);
+                        populateForecastOptions(forecastData);
+
                         const idx = getNearestForecastIndex(new Date());
                         forecastPicker.value = new Date(fData[idx].dtg).toISOString().slice(0,16);
                         applyForecast();
