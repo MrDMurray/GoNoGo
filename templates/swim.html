@@ -26,9 +26,10 @@
 
             <form method="post" class="input-form grid gap-4">
                 <div>
-                    <label for="forecast-picker" class="block font-medium">Forecast time</label>
-                    <input type="datetime-local" id="forecast-picker" class="w-full">
+                
+                    
                     <div id="forecast-time" class="text-center text-1xl sm:text-2xl w-full mt-1"></div>
+                    
                     <div id="tide-section" class="mt-2">
                         <table id="tide-table" class="tide-table w-full text-left border-collapse text-lg">
                             <thead>
@@ -83,9 +84,9 @@
                         <p id="sunrise" class="mt-1">-</p>
                     </div>
                 </div>
-
-
-
+                <br>   
+                <label class="block font-medium sm:text-sm">Change date:</label>
+                <input type="datetime-local" id="forecast-picker" class="w-full">
             </form>
         </div>
         <div class="mt-4 text-center">
