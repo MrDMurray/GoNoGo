@@ -88,7 +88,11 @@
 
 
             </form>
-            <a href="/" class="block mt-2"><img src="http://quacksolution.com/home.png" alt="Home" class="inline-block"></a>
+        </div>
+        <div class="mt-4 text-center">
+            <a href="/">
+                <img src="http://quacksolution.com/home.png" alt="Home" width="50" height="50" class="mx-auto">
+            </a>
         </div>
     </div>
 
@@ -187,6 +191,7 @@
                 tempEl.textContent = '-';
                 waveEl.textContent = '-';
             }
+            applyColorScales();
         }
 
         function updateSunTimes(dateStr) {
@@ -201,6 +206,36 @@
                 sunriseEl.textContent = '-';
                 sunsetEl.textContent = '-';
             }
+        }
+
+        function scaleColor(val, min, max, start, end) {
+            const ratio = Math.min(Math.max((val - min) / (max - min), 0), 1);
+            const r = Math.round(start[0] + (end[0] - start[0]) * ratio);
+            const g = Math.round(start[1] + (end[1] - start[1]) * ratio);
+            const b = Math.round(start[2] + (end[2] - start[2]) * ratio);
+            return `rgb(${r},${g},${b})`;
+        }
+
+        function applyColorScales() {
+            const windVal = parseFloat(windSpeedInput.textContent) || 0;
+            document.getElementById('wind_speed').style.color = scaleColor(windVal, 0, 50, [0,128,0], [255,0,0]);
+
+            const waveVal = parseFloat(document.getElementById('wave_conditions').textContent) || 0;
+            document.getElementById('wave_conditions').style.color = scaleColor(waveVal, 0, 2, [0,128,0], [255,0,0]);
+
+            const seaVal = parseFloat(document.getElementById('sea_temperature').textContent) || 0;
+            document.getElementById('sea_temperature').style.color = scaleColor(seaVal, 7, 20, [0,0,255], [255,0,0]);
+
+            const airEl = document.getElementById('air_temperature');
+            if (airEl) {
+                const airVal = parseFloat(airEl.textContent) || 0;
+                airEl.style.color = scaleColor(airVal, 0, 30, [0,0,255], [255,0,0]);
+            }
+
+            const qualityEl = document.getElementById('water_quality');
+            const qual = qualityEl.textContent.trim();
+            const qColors = {"Excellent": "blue", "Good": "green", "Sufficient": "orange", "Poor": "red"};
+            if (qColors[qual]) qualityEl.style.color = qColors[qual];
         }
 
         function updateCurrentConditions() {
@@ -232,6 +267,7 @@
             updateWindArrow();
             updateCurrentConditions();
             updateTideTable();
+            applyColorScales();
         }
 
 
@@ -256,6 +292,7 @@
         // Initialize on load
         updateWindArrow();
         updateCurrentConditions();
+        applyColorScales();
 
         window.addEventListener('DOMContentLoaded', () => {
             const loading = document.getElementById('loading-message');
@@ -299,6 +336,7 @@
                     }
                     if (quality && !quality.error && quality.status) {
                         waterQualityEl.textContent = quality.status;
+                        applyColorScales();
                     }
                     applyForecast();
                 })
