@@ -88,7 +88,7 @@
 
 
             </form>
-            <a href="/" class="text-blue-700 underline block mt-2">Return to Home</a>
+            <a href="/" class="block mt-2"><img src="http://quacksolution.com/home.png" alt="Home" class="inline-block"></a>
         </div>
     </div>
 
@@ -100,6 +100,7 @@
         const forecastTime = document.getElementById('forecast-time');
         let forecastData = [];
         let tideData = [];
+        const waterQualityEl = document.getElementById('water_quality');
         let seaTemps = JSON.parse(localStorage.getItem('seaTemps') || 'null');
         let sunTimes = JSON.parse(localStorage.getItem('sunTimes') || 'null');
         const arrowImages = {
@@ -192,8 +193,10 @@
             const sunriseEl = document.getElementById('sunrise');
             const sunsetEl = document.getElementById('sunset');
             if (sunTimes && sunTimes[dateStr]) {
-                sunriseEl.textContent = sunTimes[dateStr].sunrise;
-                sunsetEl.textContent = sunTimes[dateStr].sunset;
+                const sr = sunTimes[dateStr].sunrise;
+                const ss = sunTimes[dateStr].sunset;
+                sunriseEl.textContent = sr.split('T')[1].slice(0,5);
+                sunsetEl.textContent = ss.split('T')[1].slice(0,5);
             } else {
                 sunriseEl.textContent = '-';
                 sunsetEl.textContent = '-';
@@ -218,8 +221,10 @@
                 airEl.textContent = item.temperature !== undefined ? `${item.temperature} \xB0C` : '-';
             }
             const dt = new Date(item.dtg);
-            const weekday = dt.toLocaleDateString('en-US', {weekday: 'long'});
-            forecastTime.textContent = `${weekday} ${dt.toLocaleString()}`;
+            const weekday = dt.toLocaleDateString('en-GB', {weekday: 'long'});
+            const datePart = dt.toLocaleDateString('en-GB');
+            const timePart = dt.toLocaleTimeString('en-GB', {hour: 'numeric', minute:'2-digit', hour12: true});
+            forecastTime.textContent = `${weekday} ${datePart}, ${timePart}`;
             const isoTime = dt.toISOString().slice(0,16);
             const dateStr = dt.toISOString().slice(0,10);
             updateSeaTemp(isoTime);
@@ -259,9 +264,10 @@
                 fetch('/forecast').then(r => r.json()),
                 fetch('/tides').then(r => r.json()),
                 fetch('https://marine-api.open-meteo.com/v1/marine?latitude=53.583679&longitude=-6.100253&hourly=wave_height,sea_surface_temperature&timezone=UTC').then(r => r.json()),
-                fetch('https://api.open-meteo.com/v1/forecast?latitude=53.58&longitude=-6.10&daily=sunrise,sunset&timezone=UTC').then(r => r.json())
+                fetch('https://api.open-meteo.com/v1/forecast?latitude=53.58&longitude=-6.10&daily=sunrise,sunset&timezone=UTC').then(r => r.json()),
+                fetch('/water_quality').then(r => r.json())
             ])
-                .then(([fData, tData, marine, sun]) => {
+                .then(([fData, tData, marine, sun, quality]) => {
                     if (!fData.error && fData.length) {
                         forecastData = fData;
                         forecastSlider.max = fData.length - 1;
@@ -290,6 +296,9 @@
                             sunTimes[d] = {sunrise: sun.daily.sunrise[i], sunset: sun.daily.sunset[i]};
                         });
                         localStorage.setItem('sunTimes', JSON.stringify(sunTimes));
+                    }
+                    if (quality && !quality.error && quality.status) {
+                        waterQualityEl.textContent = quality.status;
                     }
                     applyForecast();
                 })

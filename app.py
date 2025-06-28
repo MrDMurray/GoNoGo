@@ -157,6 +157,23 @@ def fetch_forecast_data():
     except Exception:
         return []
 
+def fetch_water_quality_status(beach_name="Skerries, South Beach"):
+    """Return latest sample_water_quality_status string or None."""
+    base_url = "https://data.epa.ie/bw/api/v1/measurements?page={}"
+    # The API does not appear to provide direct filtering, so scan
+    # recent pages starting from the end (approx 454 as of 2025).
+    for page in range(454, 439, -1):
+        try:
+            resp = requests.get(base_url.format(page), timeout=10)
+            resp.raise_for_status()
+            data = resp.json()
+        except Exception:
+            continue
+        for rec in data.get("list", []):
+            if rec.get("beach_name") == beach_name:
+                return rec.get("sample_water_quality_status")
+    return None
+
 
 # ------------------------------
 # Utility functions
@@ -326,6 +343,15 @@ def forecast():
 def tides():
     """Return tide prediction data as JSON."""
     return jsonify(TIDES)
+
+
+@app.route('/water_quality')
+def water_quality():
+    """Return latest water quality status for Skerries, South Beach."""
+    status = fetch_water_quality_status()
+    if not status:
+        return jsonify({'error': 'Failed to fetch data'}), 500
+    return jsonify({'status': status})
 
 
 if __name__ == '__main__':
