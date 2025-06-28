@@ -100,6 +100,8 @@
         const forecastTime = document.getElementById('forecast-time');
         let forecastData = [];
         let tideData = [];
+        let seaTemps = JSON.parse(localStorage.getItem('seaTemps') || 'null');
+        let sunTimes = JSON.parse(localStorage.getItem('sunTimes') || 'null');
         const arrowImages = {
             1: "http://quacksolution.com/force1.png",
             2: "http://quacksolution.com/force2.png",
@@ -174,6 +176,30 @@
             });
         }
 
+        function updateSeaTemp(isoTime) {
+            const tempEl = document.getElementById('sea_temperature');
+            const waveEl = document.getElementById('wave_conditions');
+            if (seaTemps && seaTemps[isoTime]) {
+                tempEl.textContent = `${seaTemps[isoTime].temp} \xB0C`;
+                waveEl.textContent = `${seaTemps[isoTime].wave} m`;
+            } else {
+                tempEl.textContent = '-';
+                waveEl.textContent = '-';
+            }
+        }
+
+        function updateSunTimes(dateStr) {
+            const sunriseEl = document.getElementById('sunrise');
+            const sunsetEl = document.getElementById('sunset');
+            if (sunTimes && sunTimes[dateStr]) {
+                sunriseEl.textContent = sunTimes[dateStr].sunrise;
+                sunsetEl.textContent = sunTimes[dateStr].sunset;
+            } else {
+                sunriseEl.textContent = '-';
+                sunsetEl.textContent = '-';
+            }
+        }
+
         function updateCurrentConditions() {
         const speed = parseFloat(windSpeedInput.textContent) || 0;
         const dir = parseFloat(windDirInput.textContent) || 0;
@@ -187,9 +213,17 @@
             if (!item) return;
             windSpeedInput.textContent = item.speed;
             windDirInput.textContent = item.direction;
+            const airEl = document.getElementById('air_temperature');
+            if (airEl) {
+                airEl.textContent = item.temperature !== undefined ? `${item.temperature} \xB0C` : '-';
+            }
             const dt = new Date(item.dtg);
             const weekday = dt.toLocaleDateString('en-US', {weekday: 'long'});
             forecastTime.textContent = `${weekday} ${dt.toLocaleString()}`;
+            const isoTime = dt.toISOString().slice(0,16);
+            const dateStr = dt.toISOString().slice(0,10);
+            updateSeaTemp(isoTime);
+            updateSunTimes(dateStr);
             updateWindArrow();
             updateCurrentConditions();
             updateTideTable();
@@ -224,8 +258,8 @@
             Promise.all([
                 fetch('/forecast').then(r => r.json()),
                 fetch('/tides').then(r => r.json()),
-                fetch('https://marine-api.open-meteo.com/v1/marine?latitude=53.583679&longitude=-6.100253&hourly=wave_height,sea_surface_temperature&current=wave_height,sea_surface_temperature&wind_speed_unit=ms').then(r => r.json()),
-                fetch('https://api.sunrise-sunset.org/json?lat=53.58&lng=-6.10&date=today').then(r => r.json())
+                fetch('https://marine-api.open-meteo.com/v1/marine?latitude=53.583679&longitude=-6.100253&hourly=wave_height,sea_surface_temperature&timezone=UTC').then(r => r.json()),
+                fetch('https://api.open-meteo.com/v1/forecast?latitude=53.58&longitude=-6.10&daily=sunrise,sunset&timezone=UTC').then(r => r.json())
             ])
                 .then(([fData, tData, marine, sun]) => {
                     if (!fData.error && fData.length) {
@@ -240,18 +274,24 @@
                         tideData = tData;
                         updateTideTable();
                     }
-                    if (marine && !marine.error && marine.current) {
-                        const waveEl = document.getElementById('wave_conditions');
-                        const tempEl = document.getElementById('sea_temperature');
-                        waveEl.textContent = `${marine.current.wave_height} m`;
-                        tempEl.textContent = `${marine.current.sea_surface_temperature} °C`;
+                    if (marine && marine.hourly) {
+                        seaTemps = {};
+                        marine.hourly.time.forEach((t, i) => {
+                            seaTemps[t] = {
+                                temp: marine.hourly.sea_surface_temperature[i],
+                                wave: marine.hourly.wave_height[i]
+                            };
+                        });
+                        localStorage.setItem('seaTemps', JSON.stringify(seaTemps));
                     }
-                    if (sun && sun.status === 'OK' && sun.results) {
-                        const sunsetEl = document.getElementById('sunset');
-                        const sunriseEl = document.getElementById('sunrise');
-                        sunsetEl.textContent = sun.results.sunset;
-                        sunriseEl.textContent = sun.results.sunrise;
+                    if (sun && sun.daily) {
+                        sunTimes = {};
+                        sun.daily.time.forEach((d, i) => {
+                            sunTimes[d] = {sunrise: sun.daily.sunrise[i], sunset: sun.daily.sunset[i]};
+                        });
+                        localStorage.setItem('sunTimes', JSON.stringify(sunTimes));
                     }
+                    applyForecast();
                 })
                 .catch(() => {
                     if (loading) loading.textContent = 'Could not load weather data.';

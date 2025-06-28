@@ -128,7 +128,7 @@ def fetch_latest_wind_data():
 
 
 def fetch_forecast_data():
-    """Return list of {'dtg', 'speed', 'direction'} dicts from Dublin Airport."""
+    """Return list of {'dtg', 'speed', 'direction', 'temperature'} dicts from Dublin Airport."""
     url = "https://www.met.ie/Open_Data/json/dublin_airport.json"
     try:
         resp = requests.get(url, timeout=10)
@@ -140,13 +140,19 @@ def fetch_forecast_data():
             params = it.get("weatherparameters", [])
             wind_speed = None
             wind_dir = None
+            temp = None
             for p in params:
                 if "Wind speed [m/s]" in p:
                     wind_speed = round(p["Wind speed [m/s]"] * 3.6, 1)
                 if "Wind direction [deg]" in p:
                     wind_dir = p["Wind direction [deg]"]
+                if "Temperature [C]" in p:
+                    temp = p["Temperature [C]"]
             if wind_speed is not None and wind_dir is not None:
-                forecast.append({"dtg": it.get("dtg"), "speed": wind_speed, "direction": wind_dir})
+                entry = {"dtg": it.get("dtg"), "speed": wind_speed, "direction": wind_dir}
+                if temp is not None:
+                    entry["temperature"] = temp
+                forecast.append(entry)
         return forecast
     except Exception:
         return []
