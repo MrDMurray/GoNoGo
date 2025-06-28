@@ -224,9 +224,10 @@
             Promise.all([
                 fetch('/forecast').then(r => r.json()),
                 fetch('/tides').then(r => r.json()),
-                fetch('https://marine-api.open-meteo.com/v1/marine?latitude=53.583679&longitude=-6.100253&hourly=wave_height,sea_surface_temperature&current=wave_height,sea_surface_temperature&wind_speed_unit=ms').then(r => r.json())
+                fetch('https://marine-api.open-meteo.com/v1/marine?latitude=53.583679&longitude=-6.100253&hourly=wave_height,sea_surface_temperature&current=wave_height,sea_surface_temperature&wind_speed_unit=ms').then(r => r.json()),
+                fetch('https://api.sunrise-sunset.org/json?lat=53.58&lng=-6.10&date=today').then(r => r.json())
             ])
-                .then(([fData, tData, marine]) => {
+                .then(([fData, tData, marine, sun]) => {
                     if (!fData.error && fData.length) {
                         forecastData = fData;
                         forecastSlider.max = fData.length - 1;
@@ -244,6 +245,12 @@
                         const tempEl = document.getElementById('sea_temperature');
                         waveEl.textContent = `${marine.current.wave_height} m`;
                         tempEl.textContent = `${marine.current.sea_surface_temperature} °C`;
+                    }
+                    if (sun && sun.status === 'OK' && sun.results) {
+                        const sunsetEl = document.getElementById('sunset');
+                        const sunriseEl = document.getElementById('sunrise');
+                        sunsetEl.textContent = sun.results.sunset;
+                        sunriseEl.textContent = sun.results.sunrise;
                     }
                 })
                 .catch(() => {
