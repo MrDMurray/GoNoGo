@@ -26,10 +26,9 @@
 
             <form method="post" class="input-form grid gap-4">
                 <div>
-                    
-                    
+                    <label for="forecast-picker" class="block font-medium">Forecast time</label>
+                    <input type="datetime-local" id="forecast-picker" class="w-full">
                     <div id="forecast-time" class="text-center text-1xl sm:text-2xl w-full mt-1"></div>
-					<input type="range" id="forecast-slider" min="0" max="0" value="0" class="w-full">
                     <div id="tide-section" class="mt-2">
                         <table id="tide-table" class="tide-table w-full text-left border-collapse text-lg">
                             <thead>
@@ -100,7 +99,7 @@
         const windDirInput = document.getElementById('wind_direction');
         const windArrow = document.getElementById('wind-arrow');
         const windSpeedInput = document.getElementById('wind_speed');
-        const forecastSlider = document.getElementById('forecast-slider');
+        const forecastPicker = document.getElementById('forecast-picker');
         const forecastTime = document.getElementById('forecast-time');
         let forecastData = [];
         let tideData = [];
@@ -153,8 +152,9 @@
         function updateTideTable() {
             if (!tideData.length) return;
             let selDate = null;
-            if (forecastData.length) {
-                const sel = forecastData[parseInt(forecastSlider.value)];
+            if (forecastData.length && forecastPicker.value) {
+                const idx = getNearestForecastIndex(new Date(forecastPicker.value));
+                const sel = forecastData[idx];
                 if (sel) selDate = new Date(sel.dtg);
             }
             if (!selDate) {
@@ -246,9 +246,10 @@
         }
 
         function applyForecast() {
-            const idx = parseInt(forecastSlider.value);
+            const idx = getNearestForecastIndex(new Date(forecastPicker.value));
             const item = forecastData[idx];
             if (!item) return;
+            forecastPicker.value = new Date(item.dtg).toISOString().slice(0,16);
             windSpeedInput.textContent = item.speed;
             windDirInput.textContent = item.direction;
             const airEl = document.getElementById('air_temperature');
@@ -283,8 +284,8 @@
             windArrow.style.transform = `rotate(${angle - 180}deg)`;
         }
 
-        if (forecastSlider) {
-            forecastSlider.addEventListener('input', () => {
+        if (forecastPicker) {
+            forecastPicker.addEventListener('change', () => {
                 applyForecast();
             });
         }
@@ -307,8 +308,10 @@
                 .then(([fData, tData, marine, sun, quality]) => {
                     if (!fData.error && fData.length) {
                         forecastData = fData;
-                        forecastSlider.max = fData.length - 1;
-                        forecastSlider.value = getNearestForecastIndex(new Date());
+                        forecastPicker.min = new Date(fData[0].dtg).toISOString().slice(0,16);
+                        forecastPicker.max = new Date(fData[fData.length - 1].dtg).toISOString().slice(0,16);
+                        const idx = getNearestForecastIndex(new Date());
+                        forecastPicker.value = new Date(fData[idx].dtg).toISOString().slice(0,16);
                         applyForecast();
                     } else if (loading) {
                         loading.textContent = 'Could not load weather data.';
