@@ -93,3 +93,15 @@ input[type="range"]::-moz-range-thumb {
     width: 35px;
     height: 35px;
 }
+.scroll-wheel {
+    font-family: 'Courier New', monospace;
+    background-color: #f7f7f7;
+    border: 2px solid #888;
+    border-radius: 8px;
+    padding: 4px;
+    height: 6rem;
+    overflow-y: auto;
+}
+.scroll-wheel option {
+    padding: 2px 4px;
+}
