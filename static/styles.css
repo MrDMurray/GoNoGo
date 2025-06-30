@@ -85,6 +85,10 @@ body {
     font-size: 2em;
 }
 
+#tide-section {
+    overflow-x: auto;
+}
+
 input[type="range"]::-webkit-slider-thumb {
     width: 35px;
     height: 35px;
@@ -132,12 +136,12 @@ input[type="range"]::-moz-range-thumb {
     background-color: #bfdbfe;
 }
 
-.forecast-card .date-day {
+.forecast-card .date-month-day {
     font-size: 1.25em;
     font-weight: bold;
 }
 
-.forecast-card .date-month,
-.forecast-card .date-time {
+.forecast-card .date-time,
+.forecast-card .date-weekday {
     font-size: 0.75em;
 }
