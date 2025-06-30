@@ -111,6 +111,7 @@ input[type="range"]::-moz-range-thumb {
     overflow-x: auto;
     gap: 0.5rem;
     padding: 4px 0;
+    scroll-snap-type: x mandatory;
 }
 .forecast-card {
     flex: 0 0 auto;
@@ -121,6 +122,7 @@ input[type="range"]::-moz-range-thumb {
     padding: 4px 8px;
     cursor: pointer;
     user-select: none;
+    scroll-snap-align: center;
 }
 .forecast-card.selected {
     background-color: #bfdbfe;

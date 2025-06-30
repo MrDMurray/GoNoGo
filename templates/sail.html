@@ -147,7 +147,7 @@
                 const dt = new Date(item.dtg);
                 const card = document.createElement('div');
                 card.className = 'forecast-card';
-                card.dataset.value = dt.toISOString().slice(0,16);
+                card.dataset.value = item.dtg;
                 card.textContent = dt.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
                 card.addEventListener('click', () => {
                     selectedForecast = card.dataset.value;
@@ -156,6 +156,25 @@
                 });
                 forecastPicker.appendChild(card);
             });
+        }
+
+        function handleScroll() {
+            const center = forecastPicker.scrollLeft + forecastPicker.clientWidth / 2;
+            let nearest = null;
+            let dist = Infinity;
+            forecastPicker.querySelectorAll('.forecast-card').forEach(card => {
+                const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+                const d = Math.abs(cardCenter - center);
+                if (d < dist) {
+                    dist = d;
+                    nearest = card;
+                }
+            });
+            if (nearest && nearest.dataset.value !== selectedForecast) {
+                selectedForecast = nearest.dataset.value;
+                updateSelectedCard();
+                applyForecast();
+            }
         }
         const arrowImages = {
             1: "http://quacksolution.com/force1.png",
@@ -249,7 +268,7 @@
             const idx = getNearestForecastIndex(new Date(selectedForecast));
             const item = forecastData[idx];
             if (!item) return;
-            selectedForecast = new Date(item.dtg).toISOString().slice(0,16);
+            selectedForecast = item.dtg;
             updateSelectedCard();
             windSpeedInput.value = item.speed;
             windDirInput.value = item.direction;
@@ -277,6 +296,9 @@
         envSelect.addEventListener('change', updateEnvDefinition);
         windDirInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
         windSpeedInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
+        forecastPicker.addEventListener('scroll', () => {
+            window.requestAnimationFrame(handleScroll);
+        });
 
 
         // Initialize on load
@@ -288,7 +310,7 @@
             reloadBtn.addEventListener('click', () => {
                 if (forecastData.length) {
                     const idx = getNearestForecastIndex(new Date());
-                    selectedForecast = new Date(forecastData[idx].dtg).toISOString().slice(0,16);
+                    selectedForecast = forecastData[idx].dtg;
                     updateSelectedCard();
                     applyForecast();
                 }
@@ -308,7 +330,7 @@
                         populateForecastOptions(forecastData);
 
                         const idx = getNearestForecastIndex(new Date());
-                        selectedForecast = new Date(fData[idx].dtg).toISOString().slice(0,16);
+                        selectedForecast = fData[idx].dtg;
                         updateSelectedCard();
                         applyForecast();
                     } else if (loading) {
