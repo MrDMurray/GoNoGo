@@ -354,5 +354,11 @@ def water_quality():
     return jsonify({'status': status})
 
 
+@app.route('/wave_sim')
+def wave_sim():
+    """Render the standalone wave simulation page."""
+    return render_template('wave_sim.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5005)
