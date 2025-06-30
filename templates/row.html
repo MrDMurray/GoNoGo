@@ -149,7 +149,10 @@
                 const card = document.createElement('div');
                 card.className = 'forecast-card';
                 card.dataset.value = item.dtg;
-                card.textContent = dt.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
+                const month = dt.toLocaleDateString('en-GB', { month: 'short' });
+                const day = dt.getDate();
+                const time = dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                card.innerHTML = `<div class="date-month">${month}</div><div class="date-day">${day}</div><div class="date-time">${time}</div>`;
                 card.addEventListener('click', () => {
                     selectedForecast = card.dataset.value;
                     updateSelectedCard();

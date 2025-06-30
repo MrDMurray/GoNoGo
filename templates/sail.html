@@ -36,14 +36,13 @@
                 <label for="forecast-picker" class="block font-medium">Forecast time</label>
                 <div id="forecast-picker" class="date-scroll w-full"></div>
                 <div id="forecast-time" class="text-center text-1xl sm:text-2xl w-full mt-1"></div>
-                    <div id="tide-section" class="mt-2">
-                        <table id="tide-table" class="tide-table w-full text-left border-collapse text-lg">
-                            <thead>
-                                <tr><th class="px-1">Time</th><th class="px-1">Tide</th></tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+                <div id="tide-section" class="mt-2">
+                    <table id="tide-table" class="tide-table w-full text-left border-collapse text-lg">
+                        <thead>
+                            <tr><th class="px-1">Time</th><th class="px-1">Tide</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
 
                 <div>
@@ -148,7 +147,10 @@
                 const card = document.createElement('div');
                 card.className = 'forecast-card';
                 card.dataset.value = item.dtg;
-                card.textContent = dt.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
+                const month = dt.toLocaleDateString('en-GB', { month: 'short' });
+                const day = dt.getDate();
+                const time = dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                card.innerHTML = `<div class="date-month">${month}</div><div class="date-day">${day}</div><div class="date-time">${time}</div>`;
                 card.addEventListener('click', () => {
                     selectedForecast = card.dataset.value;
                     updateSelectedCard();
