@@ -34,7 +34,7 @@
 
             <form method="post" class="input-form grid gap-4">
                 <label for="forecast-picker" class="block font-medium">Forecast time</label>
-                <select id="forecast-picker" size="5" class="scroll-wheel w-full"></select>
+                <div id="forecast-picker" class="date-scroll w-full"></div>
                 <div id="forecast-time" class="text-center text-1xl sm:text-2xl w-full mt-1"></div>
                     <div id="tide-section" class="mt-2">
                         <table id="tide-table" class="tide-table w-full text-left border-collapse text-lg">
@@ -133,14 +133,28 @@
         const forecastTime = document.getElementById('forecast-time');
         let forecastData = [];
         let tideData = [];
+        let selectedForecast = '';
+
+        function updateSelectedCard() {
+            forecastPicker.querySelectorAll('.forecast-card').forEach(c => {
+                c.classList.toggle('selected', c.dataset.value === selectedForecast);
+            });
+        }
+
         function populateForecastOptions(data) {
-            forecastPicker.innerHTML = "";
+            forecastPicker.innerHTML = '';
             data.forEach(item => {
                 const dt = new Date(item.dtg);
-                const opt = document.createElement("option");
-                opt.value = dt.toISOString().slice(0,16);
-                opt.textContent = dt.toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"}) + " " + dt.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
-                forecastPicker.appendChild(opt);
+                const card = document.createElement('div');
+                card.className = 'forecast-card';
+                card.dataset.value = dt.toISOString().slice(0,16);
+                card.textContent = dt.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
+                card.addEventListener('click', () => {
+                    selectedForecast = card.dataset.value;
+                    updateSelectedCard();
+                    applyForecast();
+                });
+                forecastPicker.appendChild(card);
             });
         }
         const arrowImages = {
@@ -195,8 +209,8 @@
         function updateTideTable() {
             if (!tideData.length) return;
             let selDate = null;
-            if (forecastData.length && forecastPicker.value) {
-                const idx = getNearestForecastIndex(new Date(forecastPicker.value));
+            if (forecastData.length && selectedForecast) {
+                const idx = getNearestForecastIndex(new Date(selectedForecast));
                 const sel = forecastData[idx];
                 if (sel) selDate = new Date(sel.dtg);
             }
@@ -232,10 +246,11 @@
         }
 
         function applyForecast() {
-            const idx = getNearestForecastIndex(new Date(forecastPicker.value));
+            const idx = getNearestForecastIndex(new Date(selectedForecast));
             const item = forecastData[idx];
             if (!item) return;
-            forecastPicker.value = new Date(item.dtg).toISOString().slice(0,16);
+            selectedForecast = new Date(item.dtg).toISOString().slice(0,16);
+            updateSelectedCard();
             windSpeedInput.value = item.speed;
             windDirInput.value = item.direction;
             const dt = new Date(item.dtg);
@@ -262,11 +277,7 @@
         envSelect.addEventListener('change', updateEnvDefinition);
         windDirInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
         windSpeedInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
-        if (forecastPicker) {
-            forecastPicker.addEventListener('change', () => {
-                applyForecast();
-            });
-        }
+
 
         // Initialize on load
         updateWindArrow();
@@ -277,7 +288,8 @@
             reloadBtn.addEventListener('click', () => {
                 if (forecastData.length) {
                     const idx = getNearestForecastIndex(new Date());
-                    forecastPicker.value = new Date(forecastData[idx].dtg).toISOString().slice(0,16);
+                    selectedForecast = new Date(forecastData[idx].dtg).toISOString().slice(0,16);
+                    updateSelectedCard();
                     applyForecast();
                 }
             });
@@ -296,7 +308,8 @@
                         populateForecastOptions(forecastData);
 
                         const idx = getNearestForecastIndex(new Date());
-                        forecastPicker.value = new Date(fData[idx].dtg).toISOString().slice(0,16);
+                        selectedForecast = new Date(fData[idx].dtg).toISOString().slice(0,16);
+                        updateSelectedCard();
                         applyForecast();
                     } else if (loading) {
                         loading.textContent = 'Could not load weather data.';
