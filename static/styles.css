@@ -105,3 +105,23 @@ input[type="range"]::-moz-range-thumb {
 .scroll-wheel option {
     padding: 2px 4px;
 }
+
+.date-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.5rem;
+    padding: 4px 0;
+}
+.forecast-card {
+    flex: 0 0 auto;
+    font-family: 'Courier New', monospace;
+    background-color: #f7f7f7;
+    border: 2px solid #888;
+    border-radius: 8px;
+    padding: 4px 8px;
+    cursor: pointer;
+    user-select: none;
+}
+.forecast-card.selected {
+    background-color: #bfdbfe;
+}
