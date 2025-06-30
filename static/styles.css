@@ -137,11 +137,20 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .forecast-card .date-month-day {
-    font-size: 1.25em;
-    font-weight: bold;
+    font-size: 0.7em;
+    
 }
 
-.forecast-card .date-time,
+
+
+.forecast-card .date-time {
+    font-size: 0.7em;
+	font-weight: bold;
+    
+}
+
+
 .forecast-card .date-weekday {
     font-size: 0.75em;
+	
 }

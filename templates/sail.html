@@ -14,7 +14,7 @@
     
 
     <div class="flex flex-col items-center pt-8 min-h-screen">
-        <h1 class="text-3xl font-bold text-white drop-shadow mb-4">Sailing in Skerries Harbour</h1>
+        <h1 class="text-3xl font-bold text-white drop-shadow mb-4">Sailing in Skerries</h1>
         <div id="arrow-container" class="mt-4 flex justify-center">
             <img id="wind-arrow" src="http://quacksolution.com/wind_arrow.png" alt="Wind direction arrow" aria-hidden="true" class="w-1/3 sm:w-1/4">
         </div>
@@ -23,103 +23,74 @@
             <p id="current-conditions" class="current-conditions"></p>
         </div>
         <div class="form-wrapper bg-white bg-opacity-95 rounded-xl shadow-2xl p-6 sm:p-8 w-11/12 max-w-xl">
-            {% if decision %}
-            <h2 class="text-center text-5xl font-extrabold {% if decision == 'GO' %}text-green-600{% else %}text-red-600{% endif %} mb-4">{{ decision }}</h2>
-            <ul class="list-disc list-inside text-left mb-4">
-                {% for r in reasons %}
-                <li>{{ r|safe }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
 
             <form method="post" class="input-form grid gap-4">
-                <label for="forecast-picker" class="block font-medium">Forecast time</label>
-                <div id="forecast-picker" class="date-scroll w-full"></div>
-                <div id="forecast-time" class="text-center text-1xl sm:text-2xl w-full mt-1"></div>
-                <div id="tide-section" class="mt-2">
-                    <table id="tide-table" class="tide-table w-full text-left border-collapse text-lg">
-                        <thead>
-                            <tr><th class="px-1">Time</th><th class="px-1">Tide</th></tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-
                 <div>
-                    <label for="location" class="block font-medium">Location</label>
-                    <select name="location" id="location" class="mt-1 w-full p-2 border rounded">
-                        {% for loc in locations %}
-                        <option value="{{ loc }}" {% if loc == form_data.location %}selected{% endif %}>{{ loc }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div>
-                    <div class="env-container">
-                        <label for="environment" id="environment-label" class="block font-medium">Environment
-                            <span class="ml-1 text-blue-600 cursor-help">&#9432;</span>
-                        </label>
-                        <div id="env-definition" class="env-definition">{{ env_definitions[form_data.environment] }}</div>
+                
+                    
+                    <div id="forecast-time" class="text-center text-1xl sm:text-2xl w-full mt-1"></div>
+                    
+                    <div id="tide-section" class="mt-2">
+                        <table id="tide-table" class="tide-table w-full text-left border-collapse text-lg">
+                            <thead>
+                                <tr><th class="px-1">Time</th><th class="px-1">Tide</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
-                    <select name="environment" id="environment" class="mt-1 w-full p-2 border rounded">
-                        {% for env in environments %}
-                        <option value="{{ env }}" {% if env == form_data.environment %}selected{% endif %}>{{ env }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div>
-                    <label for="distance" class="block font-medium">Distance from shore (m)</label>
-                    <input type="number" step="1" min="0" name="distance" id="distance" value="{{ form_data.distance }}" required class="mt-1 w-full p-2 border rounded">
-                </div>
-
-                <div>
-                    <label for="wind_speed" class="block font-medium">Wind speed (km/h)</label>
-                    <input type="number" step="0.1" name="wind_speed" id="wind_speed" value="{{ form_data.wind_speed }}" required class="mt-1 w-full p-2 border rounded">
-                </div>
-
-                <div>
-                    <label for="wind_direction" class="block font-medium">Wind direction (deg)</label>
-                    <input type="number" step="1" min="0" max="360" name="wind_direction" id="wind_direction" value="{{ form_data.wind_direction }}" required class="mt-1 w-full p-2 border rounded">
                 </div>
 
 
-                <div>
-                    <label for="solo_participants" class="block font-medium">Solo craft participants</label>
-                    <input type="number" min="0" name="solo_participants" id="solo_participants" value="{{ form_data.solo_participants }}" required class="mt-1 w-full p-2 border rounded">
+
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="p-2 bg-blue-50 rounded shadow">
+                        <label class="block font-medium sm:text-sm">Wind (km/h)</label>
+                        <p id="wind_speed" class="mt-1">{{ form_data.wind_speed }}</p>
+                    </div>
+
+                    <div class="p-2 bg-blue-50 rounded shadow">
+                        <label class="block font-medium sm:text-sm">Wind (deg)</label>
+                        <p id="wind_direction" class="mt-1">{{ form_data.wind_direction }}</p>
+                    </div>
+
+                    <div class="p-2 bg-blue-50 rounded shadow">
+                        <label class="block font-medium sm:text-sm">Waves</label>
+                        <p id="wave_conditions" class="mt-1">-</p>
+                    </div>
+
+                    <div class="p-2 bg-blue-50 rounded shadow">
+                        <label class="block font-medium sm:text-sm">Water Quality </label>
+                        <p id="water_quality" class="mt-1 sm:text-sm">-</p>
+                    </div>
+
+                    <div class="p-2 bg-blue-50 rounded shadow">
+                        <label class="block font-medium sm:text-sm">Sea Temp</label>
+                        <p id="sea_temperature" class="mt-1">-</p>
+                    </div>
+
+                    <div class="p-2 bg-blue-50 rounded shadow">
+                        <label class="block font-medium sm:text-sm">Air Temp</label>
+                        <p id="air_temperature" class="mt-1">-</p>
+                    </div>
+
+                    <div class="p-2 bg-blue-50 rounded shadow">
+                        <label class="block font-medium sm:text-sm">Sunset</label>
+                        <p id="sunset" class="mt-1">-</p>
+                    </div>
+
+                    <div class="p-2 bg-blue-50 rounded shadow">
+                        <label class="block font-medium sm:text-sm">Sunrise</label>
+                        <p id="sunrise" class="mt-1">-</p>
+                    </div>
                 </div>
 
-                <div>
-                    <label for="crew_participants" class="block font-medium">Crew craft participants</label>
-                    <input type="number" min="0" name="crew_participants" id="crew_participants" value="{{ form_data.crew_participants }}" required class="mt-1 w-full p-2 border rounded">
-                </div>
-
-
-                <div>
-                    <label for="level1_coaches" class="block font-medium">BCAB Paddlesport/CANI Level 1
-                        <span class="ml-1 text-blue-600 cursor-help" title="Number of instructors certified to Level 1">&#9432;</span>
-                    </label>
-                    <input type="number" min="0" name="level1_coaches" id="level1_coaches" value="{{ form_data.level1_coaches }}" required class="mt-1 w-full p-2 border rounded">
-                </div>
-
-                <div>
-                    <label for="level3_coaches" class="block font-medium">BCAB Coach/CANI Level 3
-                        <span class="ml-1 text-blue-600 cursor-help" title="Number of instructors certified to Level 3">&#9432;</span>
-                    </label>
-                    <input type="number" min="0" name="level3_coaches" id="level3_coaches" value="{{ form_data.level3_coaches }}" required class="mt-1 w-full p-2 border rounded">
-                </div>
-
-                <div class="col-span-full flex flex-col sm:flex-row gap-2 mt-2">
-                    <button type="submit" class="action-btn w-full py-2 px-4 bg-blue-600 text-white rounded">Check again with above values</button>
-                    <button type="button" id="reload-weather" class="action-btn w-full py-2 px-4 bg-gray-600 text-white rounded">Reload Current Conditions from Met Éireann</button>
-                </div>
-
+                <div id="forecast-picker" class="date-scroll w-full"></div>
             </form>
-            
         </div>
         <div class="mt-4 text-center">
             <a href="/">
-                <img src="http://quacksolution.com/home.png" alt="Home" width="50" height="50" class="mx-auto">
+                <img src="http://quacksolution.com/home.png" alt="Home" width="100" height="100" class="mx-auto">
             </a>
         </div>
     </div>
@@ -179,19 +150,16 @@
                 applyForecast();
             }
         }
+        const waterQualityEl = document.getElementById('water_quality');
+        let seaTemps = JSON.parse(localStorage.getItem('seaTemps') || 'null');
+        let sunTimes = JSON.parse(localStorage.getItem('sunTimes') || 'null');
         const arrowImages = {
             1: "http://quacksolution.com/force1.png",
             2: "http://quacksolution.com/force2.png",
             3: "http://quacksolution.com/force3.png",
             4: "http://quacksolution.com/force4.png"
         };
-        const envDefinitions = {{ env_definitions | tojson }};
-        const envSelect = document.getElementById('environment');
         const tideTableBody = document.querySelector('#tide-table tbody');
-
-        function updateEnvDefinition() {
-            document.getElementById('env-definition').textContent = envDefinitions[envSelect.value];
-        }
         function beaufortForce(speed) {
             if (speed >= 1 && speed <= 5) return 1;
             if (speed >= 6 && speed <= 11) return 2;
@@ -260,9 +228,66 @@
             });
         }
 
+        function updateSeaTemp(isoTime) {
+            const tempEl = document.getElementById('sea_temperature');
+            const waveEl = document.getElementById('wave_conditions');
+            if (seaTemps && seaTemps[isoTime]) {
+                tempEl.textContent = `${seaTemps[isoTime].temp} \xB0C`;
+                waveEl.textContent = `${seaTemps[isoTime].wave} m`;
+            } else {
+                tempEl.textContent = '-';
+                waveEl.textContent = '-';
+            }
+            applyColorScales();
+        }
+
+        function updateSunTimes(dateStr) {
+            const sunriseEl = document.getElementById('sunrise');
+            const sunsetEl = document.getElementById('sunset');
+            if (sunTimes && sunTimes[dateStr]) {
+                const sr = sunTimes[dateStr].sunrise;
+                const ss = sunTimes[dateStr].sunset;
+                sunriseEl.textContent = sr.split('T')[1].slice(0,5);
+                sunsetEl.textContent = ss.split('T')[1].slice(0,5);
+            } else {
+                sunriseEl.textContent = '-';
+                sunsetEl.textContent = '-';
+            }
+        }
+
+        function scaleColor(val, min, max, start, end) {
+            const ratio = Math.min(Math.max((val - min) / (max - min), 0), 1);
+            const r = Math.round(start[0] + (end[0] - start[0]) * ratio);
+            const g = Math.round(start[1] + (end[1] - start[1]) * ratio);
+            const b = Math.round(start[2] + (end[2] - start[2]) * ratio);
+            return `rgb(${r},${g},${b})`;
+        }
+
+        function applyColorScales() {
+            const windVal = parseFloat(windSpeedInput.textContent) || 0;
+            document.getElementById('wind_speed').style.color = scaleColor(windVal, 0, 50, [0,128,0], [255,0,0]);
+
+            const waveVal = parseFloat(document.getElementById('wave_conditions').textContent) || 0;
+            document.getElementById('wave_conditions').style.color = scaleColor(waveVal, 0, 2, [0,128,0], [255,0,0]);
+
+            const seaVal = parseFloat(document.getElementById('sea_temperature').textContent) || 0;
+            document.getElementById('sea_temperature').style.color = scaleColor(seaVal, 7, 20, [0,0,255], [255,0,0]);
+
+            const airEl = document.getElementById('air_temperature');
+            if (airEl) {
+                const airVal = parseFloat(airEl.textContent) || 0;
+                airEl.style.color = scaleColor(airVal, 0, 30, [0,0,255], [255,0,0]);
+            }
+
+            const qualityEl = document.getElementById('water_quality');
+            const qual = qualityEl.textContent.trim();
+            const qColors = {"Excellent": "blue", "Good": "green", "Sufficient": "orange", "Poor": "red"};
+            if (qColors[qual]) qualityEl.style.color = qColors[qual];
+        }
+
         function updateCurrentConditions() {
-            const speed = parseFloat(windSpeedInput.value) || 0;
-            const dir = parseFloat(windDirInput.value) || 0;
+        const speed = parseFloat(windSpeedInput.textContent) || 0;
+        const dir = parseFloat(windDirInput.textContent) || 0;
             const text = `${speed} km/h from ${cardinalDirection(dir)} - ${beaufortForceDescription(speed)}`;
             document.getElementById('current-conditions').textContent = text;
         }
@@ -273,20 +298,31 @@
             if (!item) return;
             selectedForecast = item.dtg;
             updateSelectedCard();
-            windSpeedInput.value = item.speed;
-            windDirInput.value = item.direction;
+            windSpeedInput.textContent = item.speed;
+            windDirInput.textContent = item.direction;
+            const airEl = document.getElementById('air_temperature');
+            if (airEl) {
+                airEl.textContent = item.temperature !== undefined ? `${item.temperature} \xB0C` : '-';
+            }
             const dt = new Date(item.dtg);
-            const weekday = dt.toLocaleDateString('en-US', {weekday: 'long'});
-            forecastTime.textContent = `${weekday} ${dt.toLocaleString()}`;
+            const weekday = dt.toLocaleDateString('en-GB', {weekday: 'long'});
+            const datePart = dt.toLocaleDateString('en-GB');
+            const timePart = dt.toLocaleTimeString('en-GB', {hour: 'numeric', minute:'2-digit', hour12: true});
+            forecastTime.textContent = `${weekday} ${datePart}, ${timePart}`;
+            const isoTime = dt.toISOString().slice(0,16);
+            const dateStr = dt.toISOString().slice(0,10);
+            updateSeaTemp(isoTime);
+            updateSunTimes(dateStr);
             updateWindArrow();
             updateCurrentConditions();
             updateTideTable();
+            applyColorScales();
         }
 
 
         function updateWindArrow() {
-            const angle = parseFloat(windDirInput.value) || 0;
-            const speed = parseFloat(windSpeedInput.value) || 0;
+            const angle = parseFloat(windDirInput.textContent) || 0;
+            const speed = parseFloat(windSpeedInput.textContent) || 0;
             const force = beaufortForce(speed);
             if (force) {
                 windArrow.src = arrowImages[force];
@@ -296,42 +332,30 @@
             windArrow.style.transform = `rotate(${angle - 180}deg)`;
         }
 
-        envSelect.addEventListener('change', updateEnvDefinition);
-        windDirInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
-        windSpeedInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
-        forecastPicker.addEventListener('scroll', () => {
-            window.requestAnimationFrame(handleScroll);
-        });
 
 
         // Initialize on load
         updateWindArrow();
-        updateEnvDefinition();
         updateCurrentConditions();
-        const reloadBtn = document.getElementById('reload-weather');
-        if (reloadBtn) {
-            reloadBtn.addEventListener('click', () => {
-                if (forecastData.length) {
-                    const idx = getNearestForecastIndex(new Date());
-                    selectedForecast = forecastData[idx].dtg;
-                    updateSelectedCard();
-                    applyForecast();
-                }
-            });
-        }
+        applyColorScales();
+        forecastPicker.addEventListener('scroll', () => {
+            window.requestAnimationFrame(handleScroll);
+        });
 
         window.addEventListener('DOMContentLoaded', () => {
             const loading = document.getElementById('loading-message');
             if (loading) loading.classList.remove('hidden');
             Promise.all([
                 fetch('/forecast').then(r => r.json()),
-                fetch('/tides').then(r => r.json())
+                fetch('/tides').then(r => r.json()),
+                fetch('https://marine-api.open-meteo.com/v1/marine?latitude=53.583679&longitude=-6.100253&hourly=wave_height,sea_surface_temperature&timezone=UTC').then(r => r.json()),
+                fetch('https://api.open-meteo.com/v1/forecast?latitude=53.58&longitude=-6.10&daily=sunrise,sunset&timezone=UTC').then(r => r.json()),
+                fetch('/water_quality').then(r => r.json())
             ])
-                .then(([fData, tData]) => {
+                .then(([fData, tData, marine, sun, quality]) => {
                     if (!fData.error && fData.length) {
                         forecastData = fData;
-                        populateForecastOptions(forecastData);
-
+                          populateForecastOptions(forecastData);
                         const idx = getNearestForecastIndex(new Date());
                         selectedForecast = fData[idx].dtg;
                         updateSelectedCard();
@@ -343,6 +367,28 @@
                         tideData = tData;
                         updateTideTable();
                     }
+                    if (marine && marine.hourly) {
+                        seaTemps = {};
+                        marine.hourly.time.forEach((t, i) => {
+                            seaTemps[t] = {
+                                temp: marine.hourly.sea_surface_temperature[i],
+                                wave: marine.hourly.wave_height[i]
+                            };
+                        });
+                        localStorage.setItem('seaTemps', JSON.stringify(seaTemps));
+                    }
+                    if (sun && sun.daily) {
+                        sunTimes = {};
+                        sun.daily.time.forEach((d, i) => {
+                            sunTimes[d] = {sunrise: sun.daily.sunrise[i], sunset: sun.daily.sunset[i]};
+                        });
+                        localStorage.setItem('sunTimes', JSON.stringify(sunTimes));
+                    }
+                    if (quality && !quality.error && quality.status) {
+                        waterQualityEl.textContent = quality.status;
+                        applyColorScales();
+                    }
+                    applyForecast();
                 })
                 .catch(() => {
                     if (loading) loading.textContent = 'Could not load weather data.';
@@ -350,9 +396,6 @@
                 .finally(() => {
                     setTimeout(() => {
                         if (loading) loading.classList.add('hidden');
-                        {% if autosubmit and not decision %}
-                        document.querySelector('.input-form').submit();
-                        {% endif %}
                     }, 1000);
                 });
         });
