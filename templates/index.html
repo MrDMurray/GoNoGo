@@ -219,7 +219,7 @@
                 const day = dt.getDate();
                 const time = dt.toLocaleTimeString('en-GB', { hour: 'numeric', hour12: true }).replace(/\s+/g,'').toLowerCase();
                 const weekday = dt.toLocaleDateString('en-GB', { weekday: 'short' });
-                card.innerHTML = `<div class="date-month-day">${month} ${day}</div><div class="date-time">${time}</div><div class="date-weekday">${weekday}</div>`;
+                card.innerHTML = `<div class="date-time">${time}</div><div class="date-month-day">${month} ${day}</div><div class="date-weekday">${weekday}</div>`;
                 card.addEventListener('click', () => {
                     selectedForecast = card.dataset.value;
                     updateSelectedCard();
